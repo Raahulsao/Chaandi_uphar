@@ -1,0 +1,13 @@
+/* add noScrollbar utility for hero gallery; hides both horizontal and vertical scrollbars */
+.noScrollbar {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE/Edge */
+  -ms-overflow-style: none;
+}
+.noScrollbar::-webkit-scrollbar {
+  /* Chrome/Safari */
+  width: 0;
+  height: 0;
+  display: none;
+}
