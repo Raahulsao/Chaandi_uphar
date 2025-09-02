@@ -1,9 +1,9 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Heart, Star } from "lucide-react"
+import { Star } from "lucide-react"
 import { useState } from "react"
+import Link from "next/link"
 
 export function CategoryPage({ title }: { title: string }) {
   const all = Array.from({ length: 24 }).map((_, i) => ({
@@ -24,52 +24,44 @@ export function CategoryPage({ title }: { title: string }) {
         <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-6">{title}</h1>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {all.slice(0, visible).map((p) => (
-            <Card key={p.id} className="group overflow-hidden border-0 shadow-sm hover:shadow-md transition h-full">
-              <CardContent className="p-0 flex flex-col h-full">
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <a href={`/product/${p.id}`} className="block relative h-full w-full bg-muted">
-                    <img
-                      src={p.image || "/placeholder.svg"}
-                      alt={p.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 will-change-transform group-hover:scale-[1.03] group-focus-within:scale-[1.03]"
-                    />
-                    <img
-                      src={(p.image || "").replace(/(\.[a-z]+)$/i, "-alt$1")}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 group-active:opacity-100"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none"
-                      }}
-                    />
-                  </a>
-                  <div className="absolute bottom-3 left-3">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/90 border px-2 py-1 text-xs text-gray-700 shadow-sm">
-                      <span className="font-medium">{p.rating}</span>
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                      <span className="text-gray-500">| {p.reviews}</span>
-                    </span>
-                  </div>
-                  <button
-                    aria-label="Add to wishlist"
-                    className="absolute top-3 right-3 bg-white/80 hover:bg-white inline-flex h-8 w-8 items-center justify-center rounded-full border opacity-0 group-hover:opacity-100 transition"
-                  >
-                    <Heart className="w-4 h-4 text-[#ff8fab]" />
-                  </button>
+            <div key={p.id} className="flex flex-col bg-white">
+              <div className="relative">
+                <Link href={`/product/${p.id}`} className="block relative aspect-square overflow-hidden">
+                  <img
+                    src={p.image || "/placeholder.svg"}
+                    alt={p.name}
+                    className="w-full h-full object-cover"
+                  />
+                </Link>
+              </div>
+
+              <div className="p-4 flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg font-bold text-gray-900">{p.price}</span>
+                  {p.originalPrice && <span className="text-sm text-gray-500 line-through">{p.originalPrice}</span>}
                 </div>
 
-                <div className="p-4 flex-1 flex flex-col">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg font-bold text-gray-900">{p.price}</span>
-                    {p.originalPrice && <span className="text-sm text-gray-500 line-through">{p.originalPrice}</span>}
-                  </div>
-                  <h3 className="font-medium text-gray-800 mb-4 line-clamp-2 flex-1 text-base">{p.name}</h3>
+                <h3 className="font-medium text-gray-800 mb-4 line-clamp-2 flex-1 text-base">{p.name}</h3>
+
+                <div className="flex flex-col gap-2">
                   <Button className="w-full bg-[#ff8fab] hover:bg-[#ff7a9a] text-white rounded-md" size="sm">
                     Add to Cart
                   </Button>
+                  <Link
+                    href={`/product/${p.id}`}
+                    className="text-center text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    View Details
+                  </Link>
                 </div>
-              </CardContent>
-            </Card>
+
+                <div className="mt-2 flex items-center gap-1 text-sm text-yellow-500">
+                  <Star className="w-4 h-4 fill-current" />
+                  <span>{p.rating}</span>
+                  <span className="text-gray-500">({p.reviews})</span>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
 

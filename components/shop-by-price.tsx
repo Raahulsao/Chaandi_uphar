@@ -51,7 +51,7 @@ export default function ShopByPrice() {
                     t.isGift ? "bg-white text-[#ff3f6c]" : "bg-[#ff8fab] text-white",
                   ].join(" ")}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                     <path
                       d="M8 5l7 7-7 7"
                       stroke="currentColor"
