@@ -9,17 +9,15 @@ import PromoCollage1850 from "@/components/promo-collage"
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      <main>
-        <HeroSection />
-        <CategorySection />
-        <BestSellers />
-        <ShopByPrice />
-        <FeaturedCollections />
-        <PromoCollage1850 />
-        <Testimonials />
-        <WhyChooseUs />
-      </main>
-    </div>
+    <>
+      <HeroSection />
+      <CategorySection />
+      <BestSellers />
+      <ShopByPrice />
+      <FeaturedCollections />
+      <PromoCollage1850 />
+      <Testimonials />
+      <WhyChooseUs />
+    </>
   )
 }

@@ -6,7 +6,7 @@ import { useRef, useState, useEffect } from "react"
 export function HeroSection() {
   const slides = [
     "/Untitled design (3) (1).png",
-    "/Untitled design (2) (1).png",
+    "/Gemini.png",
     "/Untitled design (1).png",
     "/18-kt-jew-desktop.webp",
   ]
@@ -33,15 +33,13 @@ export function HeroSection() {
 
   return (
     <>
-      <div className="h-0.5 bg-white"></div>
-
-      <section className="relative overflow-hidden bg-white">
-        <div className="relative container mx-auto px-4 py-0 bg-white">
+      <section className="relative overflow-hidden bg-white mt-2 lg:mt-0 pb-0">
+        <div className="relative container mx-auto px-3 md:px-4 bg-white pb-2">
           <div
             id="heroScroller"
             ref={scrollerRef}
             onScroll={handleScroll}
-            className={`relative flex gap-0 overflow-x-auto overflow-y-hidden snap-x snap-mandatory rounded-2xl ${styles.noScrollbar} scroll-smooth bg-white`}
+            className={`relative flex gap-0 overflow-x-auto overflow-y-hidden snap-x snap-mandatory rounded-xl md:rounded-2xl ${styles.noScrollbar} scroll-smooth bg-white`}
             role="region"
             aria-label="Hero gallery"
           >
@@ -50,12 +48,12 @@ export function HeroSection() {
                 key={src}
                 src={src || "/placeholder.svg"}
                 alt={`Hero slide ${i + 1}`}
-                className="snap-center shrink-0 min-w-full w-full aspect-video md:h-[480px] lg:h-[550px] object-cover rounded-2xl"
+                className="snap-center shrink-0 min-w-full w-full aspect-[5/2] md:h-[400px] lg:h-[480px] xl:h-[520px] object-cover rounded-xl md:rounded-2xl"
               />
             ))}
           </div>
 
-          <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="mt-1 flex items-center justify-center gap-2">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -75,5 +73,5 @@ export function HeroSection() {
         </div>
       </section>
     </>
-  )
+  );
 }

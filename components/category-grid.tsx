@@ -74,7 +74,7 @@ export function CategoryGrid() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <div key={category.name} className="group">
-              <Card className="overflow-hidden border border-border shadow-sm hover:shadow-lg transition-all duration-300 bg-card relative">
+              <Card className="overflow-hidden border border-gray-300 shadow-sm hover:shadow-lg transition-all duration-300 bg-card relative">
                 <CardContent className="p-0">
                   <div className="absolute top-3 right-3 z-10">
                     <Button
@@ -136,6 +136,7 @@ export function CategoryGrid() {
                     >
                       Add to Cart
                     </Button>
+                    <Link href={`/product/${category.id}`} className="text-center text-sm text-pink-600 hover:text-pink-800 mb-2 border border-pink-600 rounded-md py-1">View Details</Link>
                   </div>
                 </CardContent>
               </Card>

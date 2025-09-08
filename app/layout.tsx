@@ -28,7 +28,9 @@ export default function RootLayout({
     <html lang="en" className={`${lora.variable} antialiased`}>
       <body className="font-serif">
         <Header />
-        {children}
+        <main className="pt-[88px] md:pt-[96px] lg:pt-[112px]">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
