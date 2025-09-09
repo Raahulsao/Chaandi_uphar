@@ -37,7 +37,7 @@ export function ProductListing({
   }));
 
   return (
-    <section className={cn("container mx-auto px-3 md:px-4 py-6 md:py-8", className)}>
+    <section className={cn("container mx-auto px-3 md:px-4 py-6 md:py-8 mt-4 md:mt-8", className)}>
       <h2 className="text-xl md:text-3xl font-semibold tracking-tight mb-4 md:mb-6 text-foreground">{title}</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-5 md:gap-6">
         {products.map((p) => (

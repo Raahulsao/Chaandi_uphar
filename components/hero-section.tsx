@@ -33,8 +33,8 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white mt-2 lg:mt-0 pb-0">
-        <div className="relative container mx-auto px-3 md:px-4 bg-white pb-2">
+      <section className="relative overflow-hidden bg-white mt-3 lg:mt-0 pb-0">
+        <div className="relative container mx-auto px-2 md:px-4 bg-white pb-2">
           <div
             id="heroScroller"
             ref={scrollerRef}
@@ -48,7 +48,7 @@ export function HeroSection() {
                 key={src}
                 src={src || "/placeholder.svg"}
                 alt={`Hero slide ${i + 1}`}
-                className="snap-center shrink-0 min-w-full w-full aspect-[5/2] md:h-[400px] lg:h-[480px] xl:h-[520px] object-cover rounded-xl md:rounded-2xl"
+                className="snap-center shrink-0 min-w-full w-full aspect-[5/1.6] md:h-[440px] lg:h-[520px] xl:h-[560px] object-cover rounded-xl md:rounded-2xl"
               />
             ))}
           </div>
