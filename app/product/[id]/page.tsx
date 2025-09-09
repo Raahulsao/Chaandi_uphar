@@ -109,9 +109,9 @@ export default function ProductPage() {
         </div>
 
         <div className="container mx-auto px-4 py-4 lg:py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 lg:gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-8 lg:gap-0">
             {/* Product Images */}
-            <div className="lg:col-span-4 space-y-2 w-full max-w-none sm:max-w-md lg:max-w-xl mx-auto lg:mx-0 lg:pr-2 lg:pl-4">
+            <div className="lg:col-span-4 space-y-2 w-full max-w-none sm:max-w-md lg:max-w-xl mx-auto lg:mx-0 lg:pr-1 lg:pl-6">
               <div className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-md border border-gray-100">
                 <Image
                   src={product.images[selectedImage] || "/placeholder.svg"}
@@ -166,7 +166,7 @@ export default function ProductPage() {
             </div>
 
             {/* Product Details */}
-            <div className="lg:col-span-4 space-y-4 lg:space-y-6 lg:pl-2">
+            <div className="lg:col-span-4 space-y-4 lg:space-y-6 lg:pl-1">
               {/* Header */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
