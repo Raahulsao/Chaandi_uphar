@@ -1,21 +1,29 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { 
   User, 
   ShoppingBag, 
   Heart, 
   MapPin, 
-  Gift, 
-  CreditCard, 
-  Settings, 
-  LogOut, 
   Package, 
-  ChevronRight
+  ChevronRight,
+  ChevronDown,
+  Plus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function AccountPage() {
+  const [showAddresses, setShowAddresses] = useState(false)
+  
+  const scrollToOrders = () => {
+    const ordersSection = document.getElementById('recent-orders-section')
+    if (ordersSection) {
+      ordersSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+  
   const recentOrders = [
     {
       id: "ORD-001",
@@ -33,13 +41,31 @@ export default function AccountPage() {
     }
   ]
 
+  const addresses = [
+    {
+      id: 1,
+      type: "Home",
+      address: "123 Main Street, Apartment 4B, Mumbai, Maharashtra 400001",
+      isDefault: true
+    },
+    {
+      id: 2,
+      type: "Work",
+      address: "456 Business Park, Office Tower, Bangalore, Karnataka 560001",
+      isDefault: false
+    },
+    {
+      id: 3,
+      type: "Other",
+      address: "789 Family House, Delhi, NCR 110001",
+      isDefault: false
+    }
+  ]
+
   const accountSections = [
-    { icon: ShoppingBag, title: "Orders", subtitle: "12 orders", href: "/orders" },
+    { icon: ShoppingBag, title: "Orders", subtitle: "12 orders", action: scrollToOrders },
     { icon: Heart, title: "Wishlist", subtitle: "8 items", href: "/wishlist" },
-    { icon: MapPin, title: "Addresses", subtitle: "3 saved", href: "/addresses" },
-    { icon: CreditCard, title: "Payment Methods", subtitle: "2 cards", href: "/payment" },
-    { icon: Gift, title: "Rewards", subtitle: "2,450 points", href: "/rewards" },
-    { icon: Settings, title: "Account Settings", subtitle: "Profile & preferences", href: "/settings" }
+    { icon: ShoppingBag, title: "Cart", subtitle: "3 items", href: "/cart" }
   ]
 
   return (
@@ -66,7 +92,6 @@ export default function AccountPage() {
                   size="sm" 
                   className="w-full"
                 >
-                  <Settings className="w-4 h-4 mr-2" />
                   Edit Profile
                 </Button>
               </div>
@@ -85,8 +110,8 @@ export default function AccountPage() {
                   <span className="font-semibold">8</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Reward Points</span>
-                  <span className="font-semibold">2,450</span>
+                  <span className="text-gray-600">Cart Items</span>
+                  <span className="font-semibold">3</span>
                 </div>
               </div>
             </div>
@@ -102,49 +127,119 @@ export default function AccountPage() {
               <div className="p-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {accountSections.map((section, index) => (
-                    <Link key={index} href={section.href} className="group">
-                      <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-[#ff8fab] hover:bg-gray-50 transition-all duration-200">
-                        <div className="flex items-center space-x-3">
-                          <section.icon className="w-5 h-5 text-gray-600 group-hover:text-[#ff8fab]" />
-                          <div>
-                            <p className="font-medium text-gray-900">{section.title}</p>
-                            <p className="text-sm text-gray-600">{section.subtitle}</p>
+                    section.href ? (
+                      <Link key={index} href={section.href} className="group">
+                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-[#ff8fab] hover:bg-gray-50 transition-all duration-200">
+                          <div className="flex items-center space-x-3">
+                            <section.icon className="w-5 h-5 text-gray-600 group-hover:text-[#ff8fab]" />
+                            <div>
+                              <p className="font-medium text-gray-900">{section.title}</p>
+                              <p className="text-sm text-gray-600">{section.subtitle}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#ff8fab]" />
+                        </div>
+                      </Link>
+                    ) : (
+                      <div key={index} className="group cursor-pointer" onClick={section.action}>
+                        <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-[#ff8fab] hover:bg-gray-50 transition-all duration-200">
+                          <div className="flex items-center space-x-3">
+                            <section.icon className="w-5 h-5 text-gray-600 group-hover:text-[#ff8fab]" />
+                            <div>
+                              <p className="font-medium text-gray-900">{section.title}</p>
+                              <p className="text-sm text-gray-600">{section.subtitle}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#ff8fab]" />
+                        </div>
+                      </div>
+                    )
+                  ))}
+                  
+                  {/* Address Dropdown */}
+                  <div className="col-span-1 sm:col-span-2">
+                    <div 
+                      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-[#ff8fab] hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                      onClick={() => setShowAddresses(!showAddresses)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <MapPin className="w-5 h-5 text-gray-600" />
+                        <div>
+                          <p className="font-medium text-gray-900">Addresses</p>
+                          <p className="text-sm text-gray-600">{addresses.length} saved</p>
+                        </div>
+                      </div>
+                      <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showAddresses ? 'rotate-180' : ''}`} />
+                    </div>
+                    
+                    {/* Address Dropdown Content */}
+                    {showAddresses && (
+                      <div className="mt-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="p-4">
+                          <div className="space-y-3">
+                            {addresses.map((address) => (
+                              <div key={address.id} className="flex items-start justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2 mb-1">
+                                    <span className="font-medium text-gray-900">{address.type}</span>
+                                    {address.isDefault && (
+                                      <span className="bg-[#ff8fab] text-white text-xs px-2 py-1 rounded-full">Default</span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-gray-600 leading-relaxed">{address.address}</p>
+                                </div>
+                                <Button variant="ghost" size="sm" className="text-[#ff8fab] hover:bg-[#ff8fab]/10">
+                                  Edit
+                                </Button>
+                              </div>
+                            ))}
+                            
+                            {/* Add New Address Button */}
+                            <button 
+                              className="w-full flex items-center justify-center space-x-2 p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-[#ff8fab] hover:bg-[#ff8fab]/5 transition-all duration-200"
+                              onClick={() => {
+                                // Handle add new address
+                                console.log('Add new address');
+                              }}
+                            >
+                              <Plus className="w-4 h-4 text-gray-500" />
+                              <span className="text-gray-700 font-medium">Add New Address</span>
+                            </button>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#ff8fab]" />
                       </div>
-                    </Link>
-                  ))}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Recent Orders */}
-            <div className="bg-white rounded-lg border border-gray-200">
-              <div className="p-6 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Recent Orders</h2>
+            <div id="recent-orders-section" className="bg-white rounded-lg border border-gray-200">
+              <div className="p-4 lg:p-6 border-b border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h2 className="text-lg lg:text-xl font-semibold text-gray-900">Recent Orders</h2>
                   <Link href="/orders">
-                    <Button variant="outline" size="sm">
-                      View All
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                      View All Orders
                     </Button>
                   </Link>
                 </div>
               </div>
               
               {recentOrders.length > 0 ? (
-                <div className="p-6">
-                  <div className="space-y-4">
+                <div className="p-4 lg:p-6">
+                  <div className="space-y-3 lg:space-y-4">
                     {recentOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{order.name}</h4>
-                          <div className="flex items-center space-x-4 mt-1 text-sm text-gray-600">
-                            <span>{order.id}</span>
-                            <span>•</span>
+                      <div key={order.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 lg:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 text-sm lg:text-base truncate">{order.name}</h4>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-xs lg:text-sm text-gray-600">
+                            <span className="font-medium">{order.id}</span>
+                            <span className="hidden sm:inline">•</span>
                             <span>{order.date}</span>
-                            <span>•</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            <span className="hidden sm:inline">•</span>
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${
                               order.status === 'Delivered' 
                                 ? 'bg-green-100 text-green-800' 
                                 : 'bg-blue-100 text-blue-800'
@@ -153,9 +248,9 @@ export default function AccountPage() {
                             </span>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-gray-900">{order.price}</p>
-                          <Button size="sm" variant="outline" className="mt-2">
+                        <div className="flex items-center justify-between sm:justify-end sm:flex-col sm:items-end gap-3 sm:gap-2">
+                          <p className="font-semibold text-gray-900 text-sm lg:text-base">{order.price}</p>
+                          <Button size="sm" variant="outline" className="text-xs lg:text-sm px-3 lg:px-4">
                             Track Order
                           </Button>
                         </div>
@@ -164,22 +259,16 @@ export default function AccountPage() {
                   </div>
                 </div>
               ) : (
-                <div className="p-8 text-center">
+                <div className="p-6 lg:p-8 text-center">
                   <Package className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-600 mb-4">No recent orders</p>
+                  <p className="text-gray-600 mb-4 text-sm lg:text-base">No recent orders</p>
                   <Link href="/">
-                    <Button>Start Shopping</Button>
+                    <Button className="text-sm lg:text-base">
+                      Start Shopping
+                    </Button>
                   </Link>
                 </div>
               )}
-            </div>
-
-            {/* Sign Out */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6">
-              <Button variant="outline" className="w-full sm:w-auto text-red-600 border-red-200 hover:bg-red-50">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
             </div>
           </div>
         </div>
