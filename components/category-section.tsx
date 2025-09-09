@@ -56,10 +56,10 @@ const categories = [
 
 export function CategorySection() {
   return (
-    <section className="py-4 md:py-6 lg:py-24 bg-white relative w-full">
+    <section className="py-4 md:py-6 lg:py-12 bg-white relative w-full">
       <div className="w-full px-3 md:px-8 relative">
         <div
-          className="no-scrollbar flex items-stretch justify-start overflow-x-auto overflow-y-hidden snap-x snap-mandatory scroll-smooth flex-row gap-2 md:gap-3 pb-2"
+          className="flex overflow-x-auto gap-3 md:gap-4 pb-2 no-scrollbar scroll-smooth"
           role="region"
           aria-label="Browse categories"
         >
@@ -67,16 +67,16 @@ export function CategorySection() {
             <Link
               key={category.name}
               href={category.href}
-              className="group shrink-0 snap-start w-[calc(25%-6px)] sm:w-[calc(20%-9px)] md:w-[calc(16.666%-12px)] lg:w-[calc(14.285%-14px)] min-w-[70px] max-w-[130px] flex flex-col items-center space-y-1 md:space-y-2"
+              className="group flex flex-col items-center space-y-1 md:space-y-2 flex-shrink-0"
             >
-              <div className="aspect-square rounded-xl md:rounded-2xl bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center overflow-hidden transition-transform duration-300 shadow-sm bg-[rgba(255,143,171,1)] border border-[rgba(255,143,171,1)] group-hover:scale-105 w-full">
+              <div className="aspect-square rounded-xl md:rounded-2xl bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center overflow-hidden transition-transform duration-300 shadow-sm bg-[rgba(255,143,171,1)] border border-[rgba(255,143,171,1)] group-hover:scale-105 w-20 h-20 md:w-28 md:h-28 lg:w-32 lg:h-32">
                 <img
                   src={category.image || "/placeholder.svg?height=200&width=200&query=jewellery"}
                   alt={category.name}
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="text-xs md:text-base font-medium text-gray-800 text-center group-hover:text-[#ff8fab] transition-colors leading-tight">
+              <span className="text-xs md:text-base font-medium text-gray-800 text-center group-hover:text-[#ff8fab] transition-colors leading-tight whitespace-nowrap max-w-[100px] md:max-w-[120px] overflow-hidden text-ellipsis">
                 {category.name}
               </span>
             </Link>

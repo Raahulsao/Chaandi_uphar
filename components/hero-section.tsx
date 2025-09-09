@@ -8,7 +8,7 @@ export function HeroSection() {
     "/Untitled design (3) (1).png",
     "/Gemini.png",
     "/Untitled design (1).png",
-    "/18-kt-jew-desktop.webp",
+    "/brand.jpg",
   ]
   const scrollerRef = useRef<HTMLDivElement | null>(null)
   const [active, setActive] = useState(0)

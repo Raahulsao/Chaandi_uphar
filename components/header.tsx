@@ -7,7 +7,7 @@ import { Search, Heart, ShoppingBag, Menu, User, MapPin, ChevronDown } from "luc
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -64,6 +64,7 @@ export function Header() {
                         <DialogContent aria-labelledby="pincode-dialog-title-mobile">
                             <DialogHeader>
                               <DialogTitle id="pincode-dialog-title-mobile">Enter delivery pincode</DialogTitle>
+                              <DialogDescription className="sr-only">Enter your pincode to see delivery options</DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-3">
                             <Input
@@ -183,6 +184,7 @@ export function Header() {
                     <DialogContent aria-labelledby="pincode-dialog-title-desktop">
                       <DialogHeader>
                         <DialogTitle id="pincode-dialog-title-desktop">Enter delivery pincode</DialogTitle>
+                        <DialogDescription className="sr-only">Enter your pincode to see delivery options</DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-3">
                         <Input

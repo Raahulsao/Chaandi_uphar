@@ -21,7 +21,7 @@ export default function PromoCollage() {
           {/* Horizontal rectangle */}
           <div className="relative rounded-lg overflow-hidden aspect-[16/9] w-full bg-[#f0e6d8]">
             <img 
-              src="/18-kt-jew-desktop.webp" 
+              src="/brand.jpg" 
               alt="Gold jewelry" 
               className="w-full h-full object-cover"
             />
@@ -64,7 +64,7 @@ export default function PromoCollage() {
             {/* Right top card */}
             <div className="card-right-top relative rounded-lg overflow-hidden bg-[#f0e6d8]">
               <img 
-                src="/18-kt-jew-desktop.webp" 
+                src="/brand.jpg" 
                 alt="Gold jewelry" 
                 className="w-full h-full object-cover"
               />
