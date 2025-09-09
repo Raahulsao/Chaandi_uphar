@@ -143,11 +143,11 @@ export default function CartPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-3 lg:space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl p-4 lg:p-6 shadow-lg border border-gray-100">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="relative w-full sm:w-24 lg:w-28 h-24 lg:h-28 flex-shrink-0 rounded-xl overflow-hidden bg-white border border-gray-200">
+                <div key={item.id} className="bg-white rounded-lg lg:rounded-2xl p-3 lg:p-6 shadow-md lg:shadow-lg border border-gray-100">
+                  <div className="flex gap-3 lg:gap-4">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-white border border-gray-200">
                       <Image 
                         src={item.image || "/placeholder.svg"} 
                         alt={item.name} 
@@ -156,50 +156,50 @@ export default function CartPage() {
                       />
                     </div>
 
-                    <div className="flex-1 min-w-0 w-full sm:w-auto">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
-                        <div className="mb-3 sm:mb-0">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col h-full">
+                        <div className="flex-1">
                           <p className="text-xs text-[#ff8fab] font-serif font-semibold">{item.category}</p>
-                          <h3 className="font-bold text-gray-900 font-serif text-sm lg:text-base line-clamp-2">{item.name}</h3>
-                          <div className="flex items-center gap-2 mt-1">
+                          <h3 className="font-bold text-gray-900 font-serif text-sm lg:text-base line-clamp-2 mb-2">{item.name}</h3>
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                             <span className="font-bold text-[#ff8fab] font-serif text-base lg:text-lg">₹{item.price.toLocaleString()}</span>
                             <span className="text-sm text-gray-500 line-through font-serif">
                               ₹{item.originalPrice.toLocaleString()}
                             </span>
-                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-semibold">
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-semibold w-fit">
                               {Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100)}% OFF
                             </span>
                           </div>
                         </div>
                         
-                        {/* Mobile quantity and remove */}
-                        <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3">
-                          <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1">
+                        {/* Mobile quantity and remove controls */}
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1">
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="w-8 h-8 p-0 hover:bg-[#ff8fab]/10 hover:text-[#ff8fab]"
+                              className="w-7 h-7 p-0 hover:bg-[#ff8fab]/10 hover:text-[#ff8fab]"
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               aria-label="Decrease quantity"
                             >
-                              <Minus className="w-4 h-4" />
+                              <Minus className="w-3 h-3" />
                             </Button>
-                            <span className="w-8 text-center font-bold text-gray-900 font-serif">{item.quantity}</span>
+                            <span className="w-8 text-center font-bold text-gray-900 font-serif text-sm">{item.quantity}</span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="w-8 h-8 p-0 hover:bg-[#ff8fab]/10 hover:text-[#ff8fab]"
+                              className="w-7 h-7 p-0 hover:bg-[#ff8fab]/10 hover:text-[#ff8fab]"
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               aria-label="Increase quantity"
                             >
-                              <Plus className="w-4 h-4" />
+                              <Plus className="w-3 h-3" />
                             </Button>
                           </div>
 
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 w-8 h-8 p-0"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 w-7 h-7 p-0"
                             onClick={() => removeItem(item.id)}
                             aria-label="Remove item"
                           >
@@ -213,9 +213,9 @@ export default function CartPage() {
               ))}
               
               {/* Continue Shopping */}
-              <div className="text-center py-6">
+              <div className="text-center py-4 lg:py-6">
                 <Link href="/">
-                  <Button variant="outline" className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white font-serif px-6">
+                  <Button variant="outline" className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white font-serif px-4 lg:px-6 text-sm lg:text-base">
                     <Crown className="w-4 h-4 mr-2" />
                     Continue Shopping
                   </Button>
@@ -224,9 +224,9 @@ export default function CartPage() {
             </div>
 
             {/* Order Summary */}
-            <div className="space-y-6 lg:sticky lg:top-20 self-start">
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                <h2 className="text-xl font-bold text-gray-900 font-serif mb-4 flex items-center">
+            <div className="space-y-4 lg:space-y-6 lg:sticky lg:top-20 self-start">
+              <div className="bg-white rounded-lg lg:rounded-2xl p-4 lg:p-6 shadow-md lg:shadow-lg border border-gray-100">
+                <h2 className="text-lg lg:text-xl font-bold text-gray-900 font-serif mb-4 flex items-center">
                   <Sparkles className="w-5 h-5 mr-2 text-[#ff8fab]" />
                   Order Summary
                 </h2>
@@ -255,28 +255,28 @@ export default function CartPage() {
                     </span>
                   </div>
                   <div className="border-t border-gray-200 pt-3">
-                    <div className="flex justify-between font-bold text-lg">
+                    <div className="flex justify-between font-bold text-base lg:text-lg">
                       <span className="text-gray-900">Total</span>
                       <span className="text-[#ff8fab]">₹{total.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 space-y-3">
+                <div className="mt-4 lg:mt-6 space-y-3">
                   <div className="flex gap-2">
                     <Input
-                      placeholder="Enter promo code"
+                      placeholder="Promo code"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
-                      className="font-serif"
+                      className="font-serif text-sm"
                     />
-                    <Button variant="outline" className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white font-serif whitespace-nowrap">
+                    <Button variant="outline" className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white font-serif whitespace-nowrap text-sm px-3 lg:px-4">
                       Apply
                     </Button>
                   </div>
 
                   <Link href="/checkout" className="block">
-                    <Button className="w-full bg-[#ff8fab] hover:bg-[#ff7a9a] text-white font-serif py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+                    <Button className="w-full bg-[#ff8fab] hover:bg-[#ff7a9a] text-white font-serif py-2 lg:py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 text-sm lg:text-base">
                       <Shield className="w-4 h-4 mr-2" />
                       Proceed to Checkout
                     </Button>
@@ -284,8 +284,8 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+              {/* Trust Indicators - Hidden on mobile to save space */}
+              <div className="hidden lg:block bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
                 <h3 className="text-lg font-bold text-gray-900 font-serif mb-4 flex items-center">
                   <Shield className="w-5 h-5 mr-2 text-[#ff8fab]" />
                   Your Benefits
@@ -317,6 +317,24 @@ export default function CartPage() {
                       <p className="font-semibold text-gray-900 font-serif text-sm">Easy returns</p>
                       <p className="text-xs text-gray-600">30-day return policy</p>
                     </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Mobile trust indicators - Compact version */}
+              <div className="lg:hidden bg-white rounded-lg p-4 shadow-md border border-gray-100">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="flex flex-col items-center">
+                    <Truck className="w-5 h-5 text-[#ff8fab] mb-1" />
+                    <span className="text-xs font-semibold text-gray-900">Free Ship</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Shield className="w-5 h-5 text-[#ff8fab] mb-1" />
+                    <span className="text-xs font-semibold text-gray-900">Secure</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Award className="w-5 h-5 text-[#ff8fab] mb-1" />
+                    <span className="text-xs font-semibold text-gray-900">Returns</span>
                   </div>
                 </div>
               </div>
