@@ -109,9 +109,9 @@ export default function ProductPage() {
         </div>
 
         <div className="container mx-auto px-4 py-4 lg:py-6">
-          <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 lg:gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-8 gap-4 lg:gap-2">
             {/* Product Images */}
-            <div className="lg:col-span-4 space-y-2 w-full max-w-none sm:max-w-md lg:max-w-xl mx-auto lg:mx-0">
+            <div className="lg:col-span-4 space-y-2 w-full max-w-none sm:max-w-md lg:max-w-xl mx-auto lg:mx-0 lg:pr-2 lg:pl-4">
               <div className="relative aspect-square overflow-hidden rounded-lg bg-white shadow-md border border-gray-100">
                 <Image
                   src={product.images[selectedImage] || "/placeholder.svg"}
@@ -166,7 +166,7 @@ export default function ProductPage() {
             </div>
 
             {/* Product Details */}
-            <div className="lg:col-span-4 space-y-4 lg:space-y-6">
+            <div className="lg:col-span-4 space-y-4 lg:space-y-6 lg:pl-2">
               {/* Header */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -323,20 +323,20 @@ export default function ProductPage() {
             
             {/* Details Section */}
             <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 font-serif flex items-center mb-3">
-                <Gem className="w-4 h-4 mr-2 text-[#ff8fab]" />
+              <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-serif flex items-center mb-3">
+                <Gem className="w-4 lg:w-5 h-4 lg:h-5 mr-2 text-[#ff8fab]" />
                 Premium Features
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {product.features.map((feature, index) => (
                   <div key={index} className="flex items-center space-x-2 p-2 bg-gradient-to-r from-pink-50 to-purple-50 rounded-md">
                     <div className="w-1 h-1 bg-[#ff8fab] rounded-full" />
-                    <span className="font-serif text-gray-800 text-xs">{feature}</span>
+                    <span className="font-serif text-gray-800 text-xs lg:text-sm">{feature}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-3 p-3 bg-gradient-to-r from-[#ff8fab]/5 to-purple-100/30 rounded-md border border-[#ff8fab]/20">
-                <p className="text-gray-700 font-serif text-xs leading-relaxed">
+                <p className="text-gray-700 font-serif text-xs lg:text-sm leading-relaxed">
                   Each piece is carefully crafted by our master artisans using traditional techniques 
                   combined with modern precision. Our jewelry represents the perfect fusion of 
                   timeless elegance and contemporary style.
@@ -346,12 +346,12 @@ export default function ProductPage() {
 
             {/* Specifications Section */}
             <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 font-serif mb-3">Technical Specifications</h3>
+              <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-serif mb-3">Technical Specifications</h3>
               <div className="space-y-2">
                 {Object.entries(product.specifications).map(([key, value]) => (
                   <div key={key} className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-1 border-b border-gray-100 last:border-b-0">
-                    <span className="font-semibold text-gray-900 font-serif text-xs">{key}:</span>
-                    <span className="text-gray-700 font-serif text-xs mt-1 sm:mt-0">{value}</span>
+                    <span className="font-semibold text-gray-900 font-serif text-xs lg:text-sm">{key}:</span>
+                    <span className="text-gray-700 font-serif text-xs lg:text-sm mt-1 sm:mt-0">{value}</span>
                   </div>
                 ))}
               </div>
@@ -360,15 +360,15 @@ export default function ProductPage() {
             {/* Reviews Section */}
             <div className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-gray-100">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
-                <h3 className="text-lg font-bold text-gray-900 font-serif">Customer Reviews</h3>
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900 font-serif">Customer Reviews</h3>
                 <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                   <div className="flex">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                      <Star key={star} className="w-3 lg:w-4 h-3 lg:h-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <span className="text-sm font-semibold">{product.rating}</span>
-                  <span className="text-gray-500 text-xs">({product.reviews} reviews)</span>
+                  <span className="text-sm lg:text-base font-semibold">{product.rating}</span>
+                  <span className="text-gray-500 text-xs lg:text-sm">({product.reviews} reviews)</span>
                 </div>
               </div>
               
@@ -396,11 +396,11 @@ export default function ProductPage() {
                   <div key={index} className="p-3 bg-gradient-to-r from-gray-50 to-pink-50/30 rounded-md border border-gray-100">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
                       <div className="flex items-center space-x-2">
-                        <div className="w-6 h-6 bg-[#ff8fab] rounded-full flex items-center justify-center">
-                          <span className="text-white font-semibold text-xs">{review.name.charAt(0)}</span>
+                        <div className="w-6 lg:w-7 h-6 lg:h-7 bg-[#ff8fab] rounded-full flex items-center justify-center">
+                          <span className="text-white font-semibold text-xs lg:text-sm">{review.name.charAt(0)}</span>
                         </div>
                         <div>
-                          <p className="font-semibold text-gray-900 font-serif text-xs">{review.name}</p>
+                          <p className="font-semibold text-gray-900 font-serif text-xs lg:text-sm">{review.name}</p>
                           <p className="text-xs text-gray-500">{review.date}</p>
                         </div>
                       </div>
@@ -417,7 +417,7 @@ export default function ProductPage() {
                         ))}
                       </div>
                     </div>
-                    <p className="text-gray-700 font-serif leading-relaxed text-xs">{review.review}</p>
+                    <p className="text-gray-700 font-serif leading-relaxed text-xs lg:text-sm">{review.review}</p>
                   </div>
                 ))}
               </div>
@@ -425,7 +425,7 @@ export default function ProductPage() {
               <div className="text-center pt-3">
                 <Button 
                   variant="outline" 
-                  className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white rounded-md font-serif transition-all duration-300 text-xs h-7 px-4"
+                  className="border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white rounded-md font-serif transition-all duration-300 text-xs lg:text-sm h-7 lg:h-8 px-4"
                 >
                   Load More Reviews
                 </Button>

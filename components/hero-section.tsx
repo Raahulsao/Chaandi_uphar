@@ -48,7 +48,7 @@ export function HeroSection() {
                 key={src}
                 src={src || "/placeholder.svg"}
                 alt={`Hero slide ${i + 1}`}
-                className="snap-center shrink-0 min-w-full w-full aspect-[5/1.6] md:h-[440px] lg:h-[520px] xl:h-[560px] object-cover rounded-xl md:rounded-2xl"
+                className="snap-center shrink-0 min-w-full w-full aspect-[5/2] md:h-[440px] lg:h-[520px] xl:h-[560px] object-cover rounded-xl md:rounded-2xl"
               />
             ))}
           </div>
