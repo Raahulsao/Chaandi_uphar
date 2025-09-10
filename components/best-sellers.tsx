@@ -96,7 +96,7 @@ export function BestSellers() {
   ];
 
   return (
-    <section className="py-6 lg:py-8 bg-white">
+    <section className="pt-2 pb-6 lg:py-8 bg-white">
       <div className="container mx-auto px-3 md:px-4">
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6 text-foreground text-center">Most Gifted</h2>
         

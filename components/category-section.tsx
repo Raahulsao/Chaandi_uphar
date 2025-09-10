@@ -14,7 +14,7 @@ const categories = [
   },
   {
     name: "Rings",
-    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=200&h=200&fit=crop&crop=center",
+    image: "/hero-jewelry.png",
     href: "/rings",
   },
   {
@@ -56,7 +56,7 @@ const categories = [
 
 export function CategorySection() {
   return (
-    <section className="pt-20 pb-21 md:pt-20 md:pb-27 lg:pt-21 lg:pb-27 bg-white relative w-full">
+    <section className="pt-1 pb-2 md:pt-1 md:pb-6 lg:pt-22 lg:pb-8 bg-white relative w-full">
       <div className="w-full px-3 md:px-8 relative">
         <div
           className="flex overflow-x-auto gap-3 md:gap-4 pb-2 no-scrollbar scroll-smooth"

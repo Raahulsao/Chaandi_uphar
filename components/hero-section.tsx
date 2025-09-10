@@ -33,8 +33,8 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-white mt-3 lg:mt-0 pb-0">
-        <div className="relative container mx-auto px-2 md:px-4 bg-white pb-2">
+      <section className="relative overflow-hidden bg-white mt-3 lg:mt-0 pb-1 md:pb-2">
+        <div className="relative container mx-auto px-2 md:px-4 bg-white pb-1 md:pb-2">
           <div
             id="heroScroller"
             ref={scrollerRef}
