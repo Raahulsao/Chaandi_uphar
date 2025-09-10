@@ -22,6 +22,16 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!auth) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase authentication is not available. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -85,6 +95,15 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = async () => {
+    if (!auth || !googleProvider) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase authentication is not available. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {

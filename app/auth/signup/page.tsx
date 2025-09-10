@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -25,6 +26,16 @@ const SignUpPage = () => {
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!auth) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase authentication is not available. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     
     // Client-side validation
@@ -116,6 +127,15 @@ const SignUpPage = () => {
   };
 
   const handleGoogleSignUp = async () => {
+    if (!auth || !googleProvider) {
+      toast({
+        title: "Authentication Error",
+        description: "Firebase authentication is not available. Please refresh the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setLoading(true);
     
     try {

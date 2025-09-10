@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAnalytics, Analytics } from "firebase/analytics";
+import { getAuth, GoogleAuthProvider, Auth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -15,16 +15,24 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Initialize Firebase only if it hasn't been initialized and we're in browser
+let app: FirebaseApp | undefined;
+if (typeof window !== 'undefined') {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+}
 
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app);
+// Initialize Firebase Authentication and get a reference to the service (only on client)
+let auth: Auth | undefined;
+let googleProvider: GoogleAuthProvider | undefined;
+let analytics: Analytics | undefined;
 
-// Initialize Google Auth Provider
-export const googleProvider = new GoogleAuthProvider();
+if (typeof window !== 'undefined' && app) {
+  auth = getAuth(app);
+  googleProvider = new GoogleAuthProvider();
+  analytics = getAnalytics(app);
+}
 
-// Initialize Analytics (only in browser environment)
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+export { auth, googleProvider, analytics };
 
-export default app;
+// Export app only if available
+export const firebaseApp = typeof window !== 'undefined' && getApps().length > 0 ? getApp() : null;
