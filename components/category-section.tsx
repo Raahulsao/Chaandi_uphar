@@ -56,7 +56,7 @@ const categories = [
 
 export function CategorySection() {
   return (
-    <section className="py-4 md:py-6 lg:py-12 bg-white relative w-full">
+    <section className="pt-10 pb-12 md:pt-11 md:pb-14 lg:pt-12 lg:pb-16 bg-white relative w-full">
       <div className="w-full px-3 md:px-8 relative">
         <div
           className="flex overflow-x-auto gap-3 md:gap-4 pb-2 no-scrollbar scroll-smooth"

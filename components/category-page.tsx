@@ -77,7 +77,7 @@ export function CategoryPage({ title }: { title: string }) {
     <section className="py-6 md:py-8 lg:py-10 bg-white">
       <div className="container mx-auto px-3 md:px-4">
         <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-foreground mb-4 md:mb-6">{title}</h1>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-5 md:gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-5 md:gap-6 mt-8 md:mt-10">
           {all.slice(0, visible).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
