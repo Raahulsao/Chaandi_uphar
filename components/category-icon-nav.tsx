@@ -10,6 +10,7 @@ const items: Item[] = [
   { label: "Jewellery", href: "/jewellery", imgSrc: "/icons/necklace.png" },
   { label: "Silver", href: "/silver", imgSrc: "/icons/golden.png" },
   { label: "Chains", href: "/chains", imgSrc: "/icons/pendant-necklance.png" },
+  { label: "Pendants", href: "/pendants", imgSrc: "/icons/pendant-necklance.png" },
   { label: "Earrings", href: "/earrings", imgSrc: "/icons/earrings.png" },
   { label: "Rings", href: "/rings", imgSrc: "/icons/wedding-ring.png" },
   { label: "Bracelet", href: "/bracelet", imgSrc: "/icons/bracelet.png" },

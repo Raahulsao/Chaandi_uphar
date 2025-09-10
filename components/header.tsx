@@ -31,6 +31,7 @@ export function Header() {
     { href: "/jewellery", label: "Jewellery", imgSrc: "/icons/necklace.png" },
     { href: "/silver", label: "Silver", imgSrc: "/icons/golden.png" },
     { href: "/chains", label: "Chains", imgSrc: "/icons/pendant-necklance.png" },
+    { href: "/pendants", label: "Pendants", imgSrc: "/icons/pendant.png" },
     { href: "/earrings", label: "Earrings", imgSrc: "/icons/earrings.png" },
     { href: "/rings", label: "Rings", imgSrc: "/icons/wedding-ring.png" },
     { href: "/bracelet", label: "Bracelet", imgSrc: "/icons/bracelet.png" },

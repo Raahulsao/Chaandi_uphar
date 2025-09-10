@@ -2,40 +2,173 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Phone, User, Mail, Lock, Gem, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Phone, User, Mail, Lock, Gem, Sparkles, Gift } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 const SignUpPage = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
-  const handleSignUp = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+    setLoading(true);
+    
+    // Client-side validation
+    if (password.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      setLoading(false);
       return;
     }
-    // Implement sign-up logic here
-    console.log('Sign up attempt with:', { mobileNumber, name, email, password });
-    // Redirect to home or dashboard after successful sign-up
-    router.push('/account');
+    
+    if (!email.includes('@')) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      // Create user with email and password
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Update user profile with name
+      await updateProfile(user, {
+        displayName: name,
+      });
+      
+      // Store additional user data (mobile, referral code) in your database here
+      console.log('User created with:', { 
+        uid: user.uid, 
+        name, 
+        email, 
+        mobileNumber, 
+        referralCode 
+      });
+      
+      toast({
+        title: "Account Created Successfully!",
+        description: `Welcome to Chaandi Uphar, ${name}!`,
+      });
+      
+      router.push('/account');
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      
+      // Handle specific Firebase errors
+      if (error.code === 'auth/email-already-in-use') {
+        toast({
+          title: "Email Already Registered",
+          description: (
+            <div className="space-y-2">
+              <p>This email is already associated with an account.</p>
+              <Link href="/auth/login" className="text-[#ff8fab] hover:text-[#ff7a9a] font-semibold underline">
+                Sign in instead?
+              </Link>
+            </div>
+          ),
+          variant: "destructive",
+          duration: 8000,
+        });
+      } else if (error.code === 'auth/weak-password') {
+        toast({
+          title: "Weak Password",
+          description: "Password should be at least 6 characters long.",
+          variant: "destructive",
+        });
+      } else if (error.code === 'auth/invalid-email') {
+        toast({
+          title: "Invalid Email",
+          description: "Please enter a valid email address.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Sign Up Failed",
+          description: error.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleSignUp = () => {
-    // Implement Google sign-up logic here
-    console.log('Continue with Google');
-    // Redirect after successful Google sign-up
-    router.push('/account');
+  const handleGoogleSignUp = async () => {
+    setLoading(true);
+    
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      // Store additional data if needed
+      console.log('Google sign up:', { 
+        uid: user.uid, 
+        name: user.displayName, 
+        email: user.email 
+      });
+      
+      toast({
+        title: "Account Created Successfully!",
+        description: `Welcome ${user.displayName || 'User'}!`,
+      });
+      
+      router.push('/account');
+    } catch (error: any) {
+      console.error('Google sign up error:', error);
+      
+      // Handle specific Firebase errors for Google authentication
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        toast({
+          title: "Account Already Exists",
+          description: (
+            <div className="space-y-2">
+              <p>An account with this email already exists using a different sign-in method.</p>
+              <Link href="/auth/login" className="text-[#ff8fab] hover:text-[#ff7a9a] font-semibold underline">
+                Try signing in instead?
+              </Link>
+            </div>
+          ),
+          variant: "destructive",
+          duration: 8000,
+        });
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+          title: "Sign Up Cancelled",
+          description: "The Google sign-up process was cancelled.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Google Sign Up Failed",
+          description: error.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -148,28 +281,21 @@ const SignUpPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium font-serif">
-                  Confirm Password
+                <Label htmlFor="referralCode" className="text-gray-700 font-medium font-serif">
+                  Referral Code (Optional)
                 </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Gift className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-12 pr-12 h-12 border-gray-200 focus:border-[#ff8fab] focus:ring-[#ff8fab]/20 rounded-xl font-serif"
+                    id="referralCode"
+                    type="text"
+                    placeholder="Enter referral code for special benefits"
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                    className="pl-12 h-12 border-gray-200 focus:border-[#ff8fab] focus:ring-[#ff8fab]/20 rounded-xl font-serif"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
                 </div>
+                <p className="text-xs text-gray-500 font-serif">Have a referral code? Enter it to unlock exclusive benefits!</p>
               </div>
 
               <div className="flex items-start space-x-2">
@@ -192,9 +318,10 @@ const SignUpPage = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-[#ff8fab] to-[#ff7a9a] hover:from-[#ff7a9a] hover:to-[#ff6b89] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-serif"
+                disabled={loading}
+                className="w-full h-12 bg-gradient-to-r from-[#ff8fab] to-[#ff7a9a] hover:from-[#ff7a9a] hover:to-[#ff6b89] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-serif disabled:opacity-50"
               >
-                Create Account
+                {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
 
@@ -209,7 +336,8 @@ const SignUpPage = () => {
 
             <Button 
               variant="outline" 
-              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl font-serif transition-all duration-300" 
+              disabled={loading}
+              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl font-serif transition-all duration-300 disabled:opacity-50" 
               onClick={handleGoogleSignUp}
             >
               <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
@@ -230,7 +358,7 @@ const SignUpPage = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
+              {loading ? 'Connecting...' : 'Continue with Google'}
             </Button>
 
             <div className="mt-6 text-center">

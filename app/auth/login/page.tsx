@@ -2,32 +2,127 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signInWithPopup, signInWithEmailAndPassword } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, Phone, Lock, Gem, Heart } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 const LoginPage = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Implement login logic here
-    console.log('Login attempt with:', { mobileNumber, password });
-    // Redirect to home or dashboard after successful login
-    router.push('/account');
+    setLoading(true);
+    
+    try {
+      // Convert mobile number to email format for Firebase
+      const email = `${mobileNumber}@chaandiuphar.com`;
+      await signInWithEmailAndPassword(auth, email, password);
+      
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to Chaandi Uphar!",
+      });
+      
+      router.push('/account');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      
+      // Handle specific Firebase errors
+      if (error.code === 'auth/user-not-found') {
+        toast({
+          title: "Account Not Found",
+          description: (
+            <div className="space-y-2">
+              <p>No account found with this mobile number.</p>
+              <Link href="/auth/signup" className="text-[#ff8fab] hover:text-[#ff7a9a] font-semibold underline">
+                Create an account instead?
+              </Link>
+            </div>
+          ),
+          variant: "destructive",
+          duration: 8000,
+        });
+      } else if (error.code === 'auth/wrong-password') {
+        toast({
+          title: "Incorrect Password",
+          description: "The password you entered is incorrect. Please try again.",
+          variant: "destructive",
+        });
+      } else if (error.code === 'auth/invalid-email') {
+        toast({
+          title: "Invalid Email Format",
+          description: "Please check your mobile number format.",
+          variant: "destructive",
+        });
+      } else if (error.code === 'auth/too-many-requests') {
+        toast({
+          title: "Too Many Attempts",
+          description: "Account temporarily disabled due to many failed login attempts. Try again later.",
+          variant: "destructive",
+          duration: 10000,
+        });
+      } else {
+        toast({
+          title: "Login Failed",
+          description: error.message || "Please check your credentials and try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // Implement Google login logic here
-    console.log('Continue with Google');
-    // Redirect after successful Google login
-    router.push('/account');
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      toast({
+        title: "Login Successful",
+        description: `Welcome ${user.displayName || 'User'}!`,
+      });
+      
+      router.push('/account');
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      
+      // Handle specific Firebase errors for Google authentication
+      if (error.code === 'auth/popup-closed-by-user') {
+        toast({
+          title: "Login Cancelled",
+          description: "The Google login process was cancelled.",
+          variant: "destructive",
+        });
+      } else if (error.code === 'auth/popup-blocked') {
+        toast({
+          title: "Popup Blocked",
+          description: "Please allow popups for this site to sign in with Google.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Google Login Failed",
+          description: error.message || "Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,9 +210,10 @@ const LoginPage = () => {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-[#ff8fab] hover:bg-[#ff7a9a] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-serif"
+                disabled={loading}
+                className="w-full h-12 bg-[#ff8fab] hover:bg-[#ff7a9a] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 font-serif disabled:opacity-50"
               >
-                Sign In
+                {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
 
@@ -132,7 +228,8 @@ const LoginPage = () => {
 
             <Button 
               variant="outline" 
-              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl font-serif transition-all duration-300" 
+              disabled={loading}
+              className="w-full h-12 border-gray-200 hover:bg-gray-50 rounded-xl font-serif transition-all duration-300 disabled:opacity-50" 
               onClick={handleGoogleLogin}
             >
               <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
@@ -153,7 +250,7 @@ const LoginPage = () => {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
+              {loading ? 'Connecting...' : 'Continue with Google'}
             </Button>
 
             <div className="mt-8 text-center">

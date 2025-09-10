@@ -53,18 +53,70 @@ export function BestSellers() {
       rating: 4.6,
       reviews: 18,
     },
+    {
+      id: "5",
+      name: "Ruby Gold Pendant",
+      price: "₹4,299",
+      originalPrice: "₹6,499",
+      image: "/Untitled design (1).png",
+      hoverImage: "/Untitled design (10).png",
+      rating: 4.9,
+      reviews: 32,
+    },
+    {
+      id: "6",
+      name: "Silver Charm Bracelet",
+      price: "₹1,799",
+      originalPrice: "₹2,899",
+      image: "/Untitled design (2) (1).png",
+      hoverImage: "/Untitled design (3) (1).png",
+      rating: 4.4,
+      reviews: 12,
+    },
+    {
+      id: "7",
+      name: "Emerald Stud Earrings",
+      price: "₹5,199",
+      originalPrice: "₹7,999",
+      image: "/hero-jewelry.png",
+      hoverImage: "/New Ring.jpeg",
+      rating: 4.8,
+      reviews: 28,
+    },
+    {
+      id: "8",
+      name: "Diamond Tennis Bracelet",
+      price: "₹8,999",
+      originalPrice: "₹12,999",
+      image: "/Untitled design (1).png",
+      hoverImage: "/Untitled design (10).png",
+      rating: 4.9,
+      reviews: 45,
+    },
   ];
 
   return (
     <section className="py-6 lg:py-8 bg-white">
       <div className="container mx-auto px-3 md:px-4">
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6 text-foreground text-center">Most Gifted</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 gap-y-5 md:gap-6">
+        
+        {/* Horizontal scrollable layout with category page card styling for both mobile and desktop */}
+        <div className="flex overflow-x-auto gap-3 md:gap-6 pb-4 no-scrollbar scroll-smooth">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
       </div>
+
+      <style jsx>{`
+        .no-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
+      `}</style>
     </section>
   );
 }
@@ -83,7 +135,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
   };
 
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm h-full">
+    <div className="flex flex-col bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm h-full flex-shrink-0 w-[calc(50vw-12px)] md:w-[calc(33.333vw-16px)] lg:w-[calc(25vw-18px)]">
       <div
         className="relative aspect-square"
         onMouseEnter={handleMouseEnter}
@@ -98,7 +150,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
         </Link>
       </div>
 
-      <div className="p-2.5 md:p-4 flex flex-col flex-grow">
+      <div className="p-2.5 md:p-4 flex flex-col min-h-[150px] md:min-h-[170px]">
         <div className="flex items-center gap-1 mb-2 text-xs md:text-sm">
           <Star className="w-3 h-3 md:w-4 md:h-4 fill-current text-yellow-500" />
           <span className="font-medium text-gray-700">{product.rating}</span>
@@ -110,9 +162,9 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           {product.originalPrice && <span className="text-xs md:text-sm text-gray-500 line-through">{product.originalPrice}</span>}
         </div>
 
-        <h3 className="font-medium text-gray-800 mb-3 md:mb-4 line-clamp-2 flex-1 text-xs md:text-base leading-tight">{product.name}</h3>
+        <h3 className="font-medium text-gray-800 mb-4 line-clamp-2 text-xs md:text-base leading-tight h-[32px] md:h-[40px]">{product.name}</h3>
 
-        <div className="flex flex-col gap-2 mt-auto">
+        <div className="mt-auto">
           <Button className="w-full bg-[#ff8fab] hover:bg-[#ff7a9a] text-white rounded-md text-xs md:text-sm py-2 h-auto font-medium" size="sm">
             Add to Cart
           </Button>
