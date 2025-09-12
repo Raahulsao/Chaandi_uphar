@@ -32,23 +32,13 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // If database is not configured, return mock validation
+    // If database is not configured, return error
     if (!isSupabaseAvailable) {
-      // Mock some valid and invalid codes for testing
-      const mockValidCodes = ['DEMO1234', 'TEST5678', 'MOCK9012'];
-      const isValid = mockValidCodes.includes(cleanReferralCode);
-      
       return NextResponse.json({
-        valid: isValid,
-        referrer: isValid ? {
-          name: 'Demo User',
-          email: 'demo@example.com'
-        } : null,
-        message: isValid 
-          ? `Great! You'll get ₹100 welcome bonus and ₹200 first order discount using ${cleanReferralCode}` 
-          : 'This referral code is not valid. You can still create an account without it.',
-        mockMode: true
-      });
+        valid: false,
+        error: 'Database not configured. Please set up Supabase to use referral codes.',
+        message: 'Referral validation is currently unavailable. You can still create an account.'
+      }, { status: 503 });
     }
 
     // Find referrer by referral code

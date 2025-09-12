@@ -14,30 +14,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (!isSupabaseAvailable) {
-    // Return mock referrals when database is not configured
-    return NextResponse.json([
-      {
-        id: "demo-ref-1",
-        referrer_id: userId,
-        referred_id: "demo-user-2",
-        referral_code: "DEMO1234",
-        status: "completed",
-        reward_amount: 500,
-        reward_given: true,
-        created_at: "2024-12-15T00:00:00Z",
-        completed_at: "2024-12-20T00:00:00Z"
-      },
-      {
-        id: "demo-ref-2",
-        referrer_id: userId,
-        referred_id: "demo-user-3",
-        referral_code: "DEMO1234",
-        status: "pending",
-        reward_amount: 500,
-        reward_given: false,
-        created_at: "2024-12-25T00:00:00Z"
-      }
-    ]);
+    return NextResponse.json(
+      { error: 'Database not configured. Please set up Supabase to use the referral system.' },
+      { status: 503 }
+    );
   }
 
   try {
@@ -45,30 +25,18 @@ export async function GET(request: NextRequest) {
     const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId);
     
     if (!isValidUUID) {
-      // For non-UUID user IDs (like Firebase), return mock data for better UX
-      return NextResponse.json([
-        {
-          id: "firebase-ref-1",
-          referrer_id: userId,
-          referred_id: "firebase-user-2",
-          referral_code: "DEMO1234",
-          status: "completed",
-          reward_amount: 500,
-          reward_given: true,
-          created_at: "2024-12-15T00:00:00Z",
-          completed_at: "2024-12-20T00:00:00Z"
-        },
-        {
-          id: "firebase-ref-2",
-          referrer_id: userId,
-          referred_id: "firebase-user-3",
-          referral_code: "DEMO1234",
-          status: "pending",
-          reward_amount: 500,
-          reward_given: false,
-          created_at: "2024-12-25T00:00:00Z"
+      // For non-UUID user IDs (like Firebase), we need to find the user first
+      try {
+        const user = await db.users.findByEmail(userId); // Assuming userId might be email for Firebase users
+        if (!user) {
+          return NextResponse.json([]);
         }
-      ]);
+        const referrals = await db.referrals.findByUserId(user.id);
+        return NextResponse.json(referrals || []);
+      } catch (error) {
+        console.error('Error fetching referrals for non-UUID user:', error);
+        return NextResponse.json([]);
+      }
     }
 
     const referrals = await db.referrals.findByUserId(userId);

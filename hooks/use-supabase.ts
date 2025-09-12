@@ -13,19 +13,13 @@ export const useUser = (userId?: string) => {
 
   const createUser = async (userData: Partial<User>) => {
     if (!isSupabaseAvailable) {
-      // Return mock user data when Supabase is not configured
-      const mockUser: User = {
-        id: userData.id || 'mock-user-id',
-        email: userData.email || '',
-        name: userData.name || '',
-        mobile_number: userData.mobile_number,
-        referral_code: userData.referral_code || 'MOCK1234',
-        referred_by: userData.referred_by,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      setUser(mockUser);
-      return mockUser;
+      setError('Database not configured. Please set up Supabase to create user profiles.');
+      toast({
+        title: 'Feature Unavailable',
+        description: 'User profile creation requires database configuration',
+        variant: 'destructive',
+      });
+      return null;
     }
     
     setLoading(true);
@@ -61,10 +55,13 @@ export const useUser = (userId?: string) => {
     if (!userId) return null;
     
     if (!isSupabaseAvailable) {
-      // Return mock updated user when Supabase is not configured
-      const updatedUser = { ...user, ...updates, updated_at: new Date().toISOString() } as User;
-      setUser(updatedUser);
-      return updatedUser;
+      setError('Database not configured. Please set up Supabase to update user profiles.');
+      toast({
+        title: 'Feature Unavailable',
+        description: 'Profile updates require database configuration',
+        variant: 'destructive',
+      });
+      return null;
     }
     
     setLoading(true);
@@ -98,7 +95,7 @@ export const useUser = (userId?: string) => {
 
   const fetchUser = async (email: string) => {
     if (!isSupabaseAvailable) {
-      // Return null when Supabase is not configured
+      setError('Database not configured. Please set up Supabase to fetch user data.');
       return null;
     }
     
@@ -139,7 +136,7 @@ export const useOrders = (userId?: string) => {
     if (!userId) return;
     
     if (!isSupabaseAvailable) {
-      // Return empty orders when Supabase is not configured
+      setError('Database not configured. Please set up Supabase to fetch orders.');
       setOrders([]);
       return;
     }
@@ -266,7 +263,7 @@ export const useReferrals = (userId?: string) => {
     if (!userId) return;
     
     if (!isSupabaseAvailable) {
-      // Return empty referrals when Supabase is not configured
+      setError('Database not configured. Please set up Supabase to fetch referrals.');
       setReferrals([]);
       return;
     }
@@ -289,7 +286,7 @@ export const useReferrals = (userId?: string) => {
     if (!userId) return;
     
     if (!isSupabaseAvailable) {
-      // Return empty rewards when Supabase is not configured
+      setError('Database not configured. Please set up Supabase to fetch rewards.');
       setRewards([]);
       return;
     }

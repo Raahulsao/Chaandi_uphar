@@ -23,25 +23,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If database is not configured, return mock success
+    // If database is not configured, return error
     if (!isSupabaseAvailable) {
-      return NextResponse.json({
-        success: true,
-        referral: {
-          id: referralId,
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          reward_given: true
-        },
-        referrerReward: {
-          id: 'mock-referrer-reward-' + Date.now(),
-          type: 'referral_bonus',
-          amount: 500,
-          description: 'Referral bonus for successful referral'
-        },
-        message: 'Referral completed! Referrer earned ₹500 bonus.',
-        mockMode: true
-      });
+      return NextResponse.json(
+        { error: 'Database not configured. Please set up Supabase to use the referral system.' },
+        { status: 503 }
+      );
     }
 
     // Get referral details

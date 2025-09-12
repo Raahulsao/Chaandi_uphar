@@ -104,10 +104,27 @@ export function useAuth() {
       const data = await response.json();
 
       if (data.success) {
+        // Fetch real statistics
+        const statsResponse = await fetch(`/api/auth/user-stats?userId=${data.user.id}`);
+        let statistics = {
+          completedReferrals: 0,
+          totalEarnings: 0,
+          activeRewards: 0
+        };
+
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          statistics = {
+            completedReferrals: statsData.completedReferrals,
+            totalEarnings: statsData.totalEarnings,
+            activeRewards: statsData.activeRewards
+          };
+        }
+
         setAuthState(prev => ({
           ...prev,
           user: data.user,
-          statistics: data.statistics,
+          statistics,
           loading: false,
         }));
 

@@ -25,32 +25,12 @@ export async function POST(request: NextRequest) {
     // Clean referral code
     const cleanReferralCode = referralCode.trim().toUpperCase();
 
-    // If database is not configured, return mock success
+    // If database is not configured, return error
     if (!isSupabaseAvailable) {
-      return NextResponse.json({
-        success: true,
-        referral: {
-          id: 'mock-referral-' + Date.now(),
-          referrer_id: 'mock-referrer',
-          referred_id: userId,
-          referral_code: cleanReferralCode,
-          status: 'pending',
-          reward_amount: 500,
-          created_at: new Date().toISOString()
-        },
-        rewards: [
-          {
-            id: 'mock-reward-' + Date.now(),
-            user_id: userId,
-            type: 'order_discount',
-            amount: 200,
-            description: 'First order discount for using referral code',
-            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-          }
-        ],
-        message: 'Referral code applied! You got ₹200 discount on your first order.',
-        mockMode: true
-      });
+      return NextResponse.json(
+        { error: 'Database not configured. Please set up Supabase to use the referral system.' },
+        { status: 503 }
+      );
     }
 
     // Find referrer by referral code

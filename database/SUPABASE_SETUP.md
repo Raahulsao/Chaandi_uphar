@@ -1,213 +1,285 @@
-# Supabase Database Setup Guide
+# 🚀 Supabase Database Setup - Step by Step
 
-This guide will help you set up the Supabase database for the Luxury Jewelry App with all necessary tables, policies, and configurations.
+## ⚠️ Error Fix for Referral System
 
-## Prerequisites
+You got this error because the migration file expects a migration tracking system. Here's the **corrected SQL** to run instead.
 
-1. **Supabase Account**: Create a free account at [supabase.com](https://supabase.com)
-2. **Project Creation**: Create a new Supabase project
-3. **Environment Variables**: Have your project URL and anon key ready
+## 📋 **Step-by-Step Setup**
 
-## Step 1: Create Supabase Project
-
-1. Go to [supabase.com/dashboard](https://supabase.com/dashboard)
-2. Click "New Project"
-3. Choose your organization
-4. Fill in project details:
-   - **Name**: `luxury-jewelry-app`
-   - **Database Password**: Choose a strong password (save it securely)
-   - **Region**: Choose closest to your users
-5. Click "Create new project"
-6. Wait for the project to be ready (2-3 minutes)
-
-## Step 2: Configure Environment Variables
-
-1. In your Supabase dashboard, go to **Settings** → **API**
-2. Copy the following values:
-   - **Project URL**
-   - **anon/public key**
-
-3. Update your `.env.local` file:
-```bash
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-## Step 3: Run Database Schema
-
-1. In your Supabase dashboard, go to **SQL Editor**
-2. Click "New query"
-3. Copy the entire content of `database/schema.sql`
-4. Paste it into the SQL editor
-5. Click **Run** to execute the schema
-
-This will create:
-- ✅ **users** table with referral system
-- ✅ **orders** table with order management
-- ✅ **order_items** table for order details
-- ✅ **referrals** table for tracking referrals
-- ✅ **referral_rewards** table for bonuses and discounts
-- ✅ **Indexes** for optimal performance
-- ✅ **Row Level Security** policies
-- ✅ **Triggers** for automatic timestamp updates
-
-## Step 4: Enable Authentication
-
-1. Go to **Authentication** → **Settings**
-2. Configure the following:
-
-### Email Settings
-- **Enable email confirmations**: `true`
-- **Email confirmation redirect URL**: `http://localhost:3000/auth/callback`
-
-### Provider Settings
-- **Enable email/password**: `true`
-- **Enable Google** (optional): Configure OAuth if needed
-- **Enable Facebook** (optional): Configure OAuth if needed
-
-### Security Settings
-- **JWT expiry**: `3600` (1 hour)
-- **Refresh token expiry**: `2592000` (30 days)
-
-## Step 5: Configure Storage (Optional)
-
-If you plan to store product images in Supabase:
-
-1. Go to **Storage**
-2. Create a new bucket: `product-images`
-3. Set bucket to **Public** if images should be publicly accessible
-4. Configure upload policies as needed
-
-## Step 6: Test Database Connection
-
-1. Start your Next.js development server:
-```bash
-npm run dev
-```
-
-2. Navigate to `/account` page
-3. Check browser console for any database connection errors
-4. Verify that referral codes are being generated properly
-
-## Step 7: Verify Database Tables
-
-Run these queries in the SQL Editor to verify setup:
+### **Step 1: Run Main Database Setup**
+Create a new SQL query in Supabase and paste this:
 
 ```sql
--- Check users table
-SELECT COUNT(*) as user_count FROM users;
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Check referrals table structure
-SELECT column_name, data_type, is_nullable 
-FROM information_schema.columns 
-WHERE table_name = 'referrals';
+-- Categories table
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  slug VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  parent_id UUID REFERENCES categories(id),
+  image_url TEXT,
+  sort_order INTEGER DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
--- Check all tables exist
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
-AND table_type = 'BASE TABLE';
+-- Products table
+CREATE TABLE IF NOT EXISTS products (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  slug VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  short_description VARCHAR(500),
+  price DECIMAL(10,2) NOT NULL,
+  compare_price DECIMAL(10,2),
+  cost_price DECIMAL(10,2),
+  sku VARCHAR(100) UNIQUE,
+  category_id UUID REFERENCES categories(id),
+  tags TEXT[],
+  status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'archived')),
+  featured BOOLEAN DEFAULT FALSE,
+  weight DECIMAL(8,2),
+  dimensions JSONB,
+  seo_title VARCHAR(255),
+  seo_description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Product images table
+CREATE TABLE IF NOT EXISTS product_images (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+  cloudinary_public_id VARCHAR(255) NOT NULL,
+  url TEXT NOT NULL,
+  alt_text VARCHAR(255),
+  sort_order INTEGER DEFAULT 0,
+  is_primary BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Inventory table
+CREATE TABLE IF NOT EXISTS inventory (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE,
+  quantity INTEGER NOT NULL DEFAULT 0,
+  reserved_quantity INTEGER DEFAULT 0,
+  low_stock_threshold INTEGER DEFAULT 5,
+  track_inventory BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  mobile_number VARCHAR(20),
+  referral_code VARCHAR(20) UNIQUE NOT NULL,
+  referred_by VARCHAR(20),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Orders table
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  order_number VARCHAR(50) UNIQUE NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled')),
+  total_amount DECIMAL(10,2) NOT NULL,
+  payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded')),
+  payment_method VARCHAR(50),
+  shipping_address JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Order items table
+CREATE TABLE IF NOT EXISTS order_items (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
+  product_id VARCHAR(100) NOT NULL,
+  product_name VARCHAR(255) NOT NULL,
+  product_image TEXT,
+  quantity INTEGER NOT NULL DEFAULT 1,
+  price DECIMAL(10,2) NOT NULL,
+  total DECIMAL(10,2) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Referrals table
+CREATE TABLE IF NOT EXISTS referrals (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  referrer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  referred_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  referral_code VARCHAR(20) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'cancelled')),
+  reward_amount DECIMAL(10,2) DEFAULT 0,
+  reward_given BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  completed_at TIMESTAMP WITH TIME ZONE
+);
+
+-- Referral rewards table
+CREATE TABLE IF NOT EXISTS referral_rewards (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  referral_id UUID REFERENCES referrals(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL CHECK (type IN ('signup_bonus', 'referral_bonus', 'order_discount')),
+  amount DECIMAL(10,2) NOT NULL,
+  description TEXT,
+  used BOOLEAN DEFAULT FALSE,
+  expires_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Insert default categories
+INSERT INTO categories (id, name, slug, description, sort_order, status) VALUES 
+  ('550e8400-e29b-41d4-a716-446655440001', 'Jewellery', 'jewellery', 'Beautiful jewelry collection', 1, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'Silver', 'silver', 'Premium silver jewelry', 2, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440003', 'Chains', 'chains', 'Elegant chains and necklaces', 3, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440004', 'Pendants', 'pendants', 'Beautiful pendants', 4, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440005', 'Earrings', 'earrings', 'Stunning earrings', 5, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440006', 'Rings', 'rings', 'Exquisite rings', 6, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440007', 'Bracelet', 'bracelet', 'Stylish bracelets', 7, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440008', 'Couple Goals', 'couple-goals', 'Perfect for couples', 8, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440009', 'Gifts', 'gifts', 'Perfect gift items', 9, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440010', 'Anklets', 'anklets', 'Beautiful anklets and ankle jewelry', 10, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440011', 'Ladoo Gopal Shringaar', 'ladoo-gopal-shringaar', 'Traditional Ladoo Gopal decoration items', 11, 'active')
+ON CONFLICT (id) DO NOTHING;
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_categories_slug ON categories(slug);
+CREATE INDEX IF NOT EXISTS idx_categories_status ON categories(status);
+CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_status ON products(status);
+CREATE INDEX IF NOT EXISTS idx_products_featured ON products(featured);
+CREATE INDEX IF NOT EXISTS idx_product_images_product_id ON product_images(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_product_id ON inventory(product_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_referral_code ON users(referral_code);
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_referrals_referrer_id ON referrals(referrer_id);
+CREATE INDEX IF NOT EXISTS idx_referrals_referred_id ON referrals(referred_id);
+CREATE INDEX IF NOT EXISTS idx_referral_rewards_user_id ON referral_rewards(user_id);
+
+-- Enable RLS (Row Level Security)
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_rewards ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS policies
+CREATE POLICY "Anyone can view active categories" ON categories FOR SELECT USING (status = 'active');
+CREATE POLICY "Anyone can view active products" ON products FOR SELECT USING (status = 'active');
+CREATE POLICY "Anyone can view product images" ON product_images FOR SELECT USING (true);
+CREATE POLICY "Anyone can view inventory" ON inventory FOR SELECT USING (true);
+
+-- Grant permissions
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+
+SELECT 'Database setup completed successfully!' as message;
 ```
 
-## Database Schema Overview
+### **Step 2: Run Enhanced Referral Features (Optional)**
+Create another SQL query and paste this:
 
-### Tables Structure
+```sql
+-- Add referral analytics table
+CREATE TABLE IF NOT EXISTS referral_analytics (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  referral_code VARCHAR(20) NOT NULL,
+  clicks INTEGER DEFAULT 0,
+  conversions INTEGER DEFAULT 0,
+  conversion_rate DECIMAL(5,2) DEFAULT 0,
+  total_earnings DECIMAL(10,2) DEFAULT 0,
+  last_click_at TIMESTAMP WITH TIME ZONE,
+  last_conversion_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-#### users
-- `id` (UUID, Primary Key)
-- `email` (Unique, Not Null)
-- `name` (Not Null)
-- `mobile_number` (Optional)
-- `referral_code` (Unique, Not Null)
-- `referred_by` (Optional referral code)
-- `created_at`, `updated_at`
+-- Add referral campaign tracking
+CREATE TABLE IF NOT EXISTS referral_campaigns (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  reward_amount DECIMAL(10,2) NOT NULL,
+  bonus_multiplier DECIMAL(3,2) DEFAULT 1.0,
+  start_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  end_date TIMESTAMP WITH TIME ZONE,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-#### orders
-- `id` (UUID, Primary Key)
-- `user_id` (Foreign Key → users)
-- `order_number` (Unique)
-- `status` (pending/confirmed/processing/shipped/delivered/cancelled)
-- `total_amount` (Decimal)
-- `payment_status` (pending/paid/failed/refunded)
-- `shipping_address` (JSONB)
-- `created_at`, `updated_at`
+-- Add social sharing tracking
+CREATE TABLE IF NOT EXISTS referral_shares (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  referral_code VARCHAR(20) NOT NULL,
+  platform VARCHAR(50) NOT NULL,
+  shared_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  clicked BOOLEAN DEFAULT FALSE,
+  converted BOOLEAN DEFAULT FALSE
+);
 
-#### order_items
-- `id` (UUID, Primary Key)
-- `order_id` (Foreign Key → orders)
-- `product_id`, `product_name`, `product_image`
-- `quantity`, `price`, `total`
-- `created_at`
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_referral_analytics_user_id ON referral_analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_referral_analytics_referral_code ON referral_analytics(referral_code);
+CREATE INDEX IF NOT EXISTS idx_referral_campaigns_active ON referral_campaigns(is_active) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_referral_shares_user_id ON referral_shares(user_id);
 
-#### referrals
-- `id` (UUID, Primary Key)
-- `referrer_id` (Foreign Key → users)
-- `referred_id` (Foreign Key → users)
-- `referral_code` (The code used)
-- `status` (pending/completed/cancelled)
-- `reward_amount`, `reward_given`
-- `created_at`, `completed_at`
+-- Enable RLS
+ALTER TABLE referral_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_campaigns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE referral_shares ENABLE ROW LEVEL SECURITY;
 
-#### referral_rewards
-- `id` (UUID, Primary Key)
-- `user_id` (Foreign Key → users)
-- `referral_id` (Foreign Key → referrals)
-- `type` (signup_bonus/referral_bonus/order_discount)
-- `amount`, `description`
-- `used`, `expires_at`
-- `created_at`
+-- Insert default campaign
+INSERT INTO referral_campaigns (name, description, reward_amount, bonus_multiplier, is_active) VALUES 
+  ('Launch Campaign', 'Default referral campaign for app launch', 500.00, 1.0, TRUE)
+ON CONFLICT DO NOTHING;
 
-## Security Features
+-- Grant permissions
+GRANT ALL ON referral_analytics TO anon, authenticated, service_role;
+GRANT ALL ON referral_campaigns TO anon, authenticated, service_role;
+GRANT ALL ON referral_shares TO anon, authenticated, service_role;
 
-### Row Level Security (RLS)
-- **Enabled** on all tables
-- Users can only access their own data
-- Automatic filtering based on authenticated user
+SELECT 'Enhanced referral features added successfully!' as message;
+```
 
-### Policies
-- Users can view/update their own profile
-- Users can view their own orders and order items
-- Users can view referrals where they're involved
-- Users can view their own rewards
+## ✅ **That's It!**
 
-## Troubleshooting
+After running these two SQL queries:
 
-### Common Issues
+1. ✅ All tables will be created
+2. ✅ Categories (including Anklets & Ladoo Gopal Shringaar) will be added
+3. ✅ Referral system will be fully functional
+4. ✅ No more migration errors
 
-1. **"Invalid supabaseUrl" Error**
-   - Check `.env.local` file exists and has correct values
-   - Ensure URL starts with `https://`
-   - Restart development server after changes
+## 🔍 **Verify Setup**
 
-2. **Database Connection Failed**
-   - Verify project is active in Supabase dashboard
-   - Check API keys are correct
-   - Ensure database schema has been run
+Check your Supabase **Table Editor** - you should see:
+- `categories` (11 categories including new ones)
+- `products`
+- `inventory`
+- `users`
+- `referrals`
+- `referral_rewards`
+- `referral_analytics`
+- `referral_campaigns`
 
-3. **Permission Denied Errors**
-   - Verify RLS policies are set up correctly
-   - Check user authentication status
-   - Ensure proper table permissions
-
-4. **UUID Format Errors**
-   - The app handles Firebase UIDs automatically
-   - UUID validation is built into the API routes
-   - Non-UUID user IDs fallback to mock data
-
-### Support
-
-- **Supabase Docs**: [docs.supabase.com](https://docs.supabase.com)
-- **Discord Community**: [discord.supabase.com](https://discord.supabase.com)
-- **GitHub Issues**: Report bugs in project repository
-
-## Next Steps
-
-After successful setup:
-1. ✅ Test user registration flow
-2. ✅ Verify referral code generation
-3. ✅ Test order creation and management
-4. ✅ Validate reward distribution system
-5. ✅ Test all API endpoints
-
-Your Supabase database is now ready for the Luxury Jewelry App! 🚀
+**The error is now fixed!** 🎉

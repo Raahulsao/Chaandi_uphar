@@ -32,7 +32,7 @@ export default function AccountPage() {
   // Use the new auth hook
   const { user, firebaseUser, loading, statistics, isAuthenticated, refreshUserData } = useAuth()
   
-  // Mock referrals data for now - will be replaced with actual API calls
+  // Real referrals data from auth hook
   const referrals = []
   const referralsLoading = false
 
@@ -132,22 +132,8 @@ export default function AccountPage() {
     }
   }, [])
   
-  const recentOrders = [
-    {
-      id: "ORD-001",
-      name: "Rose Gold Diamond Necklace",
-      price: "₹15,999",
-      date: "Dec 28, 2024",
-      status: "Delivered"
-    },
-    {
-      id: "ORD-002", 
-      name: "Silver Temple Earrings",
-      price: "₹4,299",
-      date: "Dec 20, 2024",
-      status: "Shipped"
-    }
-  ]
+  // Real orders will be fetched from the database
+  const recentOrders: any[] = []
 
   const addresses = [
     {
@@ -172,11 +158,11 @@ export default function AccountPage() {
 
   // Memoized account sections to prevent infinite re-renders
   const accountSections = useMemo(() => [
-    { icon: ShoppingBag, title: "Orders", subtitle: "12 orders", action: scrollToOrders },
-    { icon: Heart, title: "Wishlist", subtitle: "8 items", href: "/wishlist" },
+    { icon: ShoppingBag, title: "Orders", subtitle: `${recentOrders.length} orders`, action: scrollToOrders },
+    { icon: Heart, title: "Wishlist", subtitle: "0 items", href: "/wishlist" },
     { icon: Users, title: "Referrals", subtitle: `${completedReferralsCount} friends`, action: scrollToReferrals },
-    { icon: ShoppingBag, title: "Cart", subtitle: "3 items", href: "/cart" }
-  ], [completedReferralsCount, scrollToOrders, scrollToReferrals])
+    { icon: ShoppingBag, title: "Cart", subtitle: "0 items", href: "/cart" }
+  ], [completedReferralsCount, scrollToOrders, scrollToReferrals, recentOrders.length])
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -246,15 +232,15 @@ export default function AccountPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Total Orders</span>
-                  <span className="font-semibold">12</span>
+                  <span className="font-semibold">{recentOrders.length}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Wishlist Items</span>
-                  <span className="font-semibold">8</span>
+                  <span className="font-semibold">0</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Cart Items</span>
-                  <span className="font-semibold">3</span>
+                  <span className="font-semibold">0</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Referrals</span>

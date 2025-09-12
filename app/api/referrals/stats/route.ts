@@ -16,37 +16,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // If database is not configured, return mock stats
+  // If database is not configured, return error
   if (!isSupabaseAvailable) {
-    return NextResponse.json({
-      stats: {
-        totalReferrals: 3,
-        completedReferrals: 2,
-        pendingReferrals: 1,
-        totalEarnings: 1000,
-        pendingEarnings: 500,
-        activeRewards: 2,
-        expiredRewards: 0,
-        clicksThisMonth: 15,
-        conversionsThisMonth: 2,
-        conversionRate: 13.33
-      },
-      recentActivity: [
-        {
-          type: 'referral_completed',
-          description: 'John Doe completed their first purchase',
-          amount: 500,
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          type: 'referral_applied',
-          description: 'New user applied your referral code',
-          amount: 0,
-          date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      ],
-      mockMode: true
-    });
+    return NextResponse.json(
+      { error: 'Database not configured. Please set up Supabase to use the referral system.' },
+      { status: 503 }
+    );
   }
 
   try {
@@ -54,30 +29,46 @@ export async function GET(request: NextRequest) {
     const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId);
     
     if (!isValidUUID) {
-      // For non-UUID user IDs (like Firebase), return mock data
-      return NextResponse.json({
-        stats: {
-          totalReferrals: 2,
-          completedReferrals: 1,
-          pendingReferrals: 1,
-          totalEarnings: 500,
-          pendingEarnings: 500,
-          activeRewards: 1,
-          expiredRewards: 0,
-          clicksThisMonth: 8,
-          conversionsThisMonth: 1,
-          conversionRate: 12.5
-        },
-        recentActivity: [
-          {
-            type: 'referral_completed',
-            description: 'Friend completed their first purchase',
-            amount: 500,
-            date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
-          }
-        ],
-        firebaseMode: true
-      });
+      // For non-UUID user IDs (like Firebase), find user first
+      try {
+        const user = await db.users.findByEmail(userId);
+        if (!user) {
+          return NextResponse.json({
+            stats: {
+              totalReferrals: 0,
+              completedReferrals: 0,
+              pendingReferrals: 0,
+              totalEarnings: 0,
+              pendingEarnings: 0,
+              activeRewards: 0,
+              expiredRewards: 0,
+              clicksThisMonth: 0,
+              conversionsThisMonth: 0,
+              conversionRate: 0
+            },
+            recentActivity: []
+          });
+        }
+        // Continue with the real user ID
+        userId = user.id;
+      } catch (error) {
+        console.error('Error finding user for stats:', error);
+        return NextResponse.json({
+          stats: {
+            totalReferrals: 0,
+            completedReferrals: 0,
+            pendingReferrals: 0,
+            totalEarnings: 0,
+            pendingEarnings: 0,
+            activeRewards: 0,
+            expiredRewards: 0,
+            clicksThisMonth: 0,
+            conversionsThisMonth: 0,
+            conversionRate: 0
+          },
+          recentActivity: []
+        });
+      }
     }
 
     // Get referrals for the user
