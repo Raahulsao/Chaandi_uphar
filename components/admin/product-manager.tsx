@@ -45,7 +45,7 @@ export const ProductManager: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [uploadingImages, setUploadingImages] = useState(false)
-  
+
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
@@ -61,12 +61,12 @@ export const ProductManager: React.FC = () => {
     seo_title: '',
     seo_description: '',
     inventory: {
-      quantity: 0,
+      quantity: 1,
       low_stock_threshold: 10,
       track_inventory: true
     }
   })
-  
+
   const [productImages, setProductImages] = useState<ProductImage[]>([])
   const { toast } = useToast()
 
@@ -183,14 +183,14 @@ export const ProductManager: React.FC = () => {
       }
 
       setProductImages(prev => [...prev, ...uploadedImages])
-      
+
       if (successCount > 0) {
         toast({
           title: 'Images Uploaded Successfully',
           description: `${successCount} image(s) uploaded to Cloudinary${errorCount > 0 ? `. ${errorCount} failed.` : '.'}`,
         })
       }
-      
+
       if (errorCount > 0 && successCount === 0) {
         toast({
           title: 'Upload Failed',
@@ -210,8 +210,53 @@ export const ProductManager: React.FC = () => {
     }
   }
 
-  const removeImage = (imageId: string) => {
+  const removeImage = async (imageId: string) => {
+    // Remove from local state immediately for better UX
     setProductImages(prev => prev.filter(img => img.id !== imageId))
+
+    // If it's a temporary image (not saved to database yet), no need to call API
+    if (imageId.startsWith('temp-')) {
+      return
+    }
+
+    // Call API to delete from database
+    try {
+      const response = await fetch(`/api/products/images/${imageId}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        // If API call fails, add the image back to local state
+        const imageToRestore = productImages.find(img => img.id === imageId)
+        if (imageToRestore) {
+          setProductImages(prev => [...prev, imageToRestore])
+        }
+
+        toast({
+          title: 'Delete Failed',
+          description: 'Failed to delete image from server. Please try again.',
+          variant: 'destructive',
+        })
+      } else {
+        toast({
+          title: 'Image Deleted',
+          description: 'Image has been deleted successfully.',
+        })
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error)
+      // If API call fails, add the image back to local state
+      const imageToRestore = productImages.find(img => img.id === imageId)
+      if (imageToRestore) {
+        setProductImages(prev => [...prev, imageToRestore])
+      }
+
+      toast({
+        title: 'Delete Failed',
+        description: 'Failed to delete image. Please try again.',
+        variant: 'destructive',
+      })
+    }
   }
 
   const setPrimaryImage = (imageId: string) => {
@@ -223,7 +268,7 @@ export const ProductManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.name || !formData.price) {
       toast({
         title: 'Validation Error',
@@ -256,7 +301,7 @@ export const ProductManager: React.FC = () => {
 
       if (response.ok) {
         const savedProduct = await response.json()
-        
+
         if (editingProduct) {
           setProducts(prev => prev.map(p => p.id === editingProduct.id ? savedProduct : p))
           toast({
@@ -273,7 +318,7 @@ export const ProductManager: React.FC = () => {
 
         resetForm()
         setIsDialogOpen(false)
-        
+
         setTimeout(() => {
           fetchProducts()
         }, 1000)
@@ -309,7 +354,7 @@ export const ProductManager: React.FC = () => {
       seo_title: '',
       seo_description: '',
       inventory: {
-        quantity: 0,
+        quantity: 1,
         low_stock_threshold: 10,
         track_inventory: true
       }
@@ -373,10 +418,10 @@ export const ProductManager: React.FC = () => {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      product.description?.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = selectedCategory === 'all' || product.category_id === selectedCategory
     const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus
-    
+
     return matchesSearch && matchesCategory && matchesStatus
   })
 
@@ -389,7 +434,7 @@ export const ProductManager: React.FC = () => {
           {products.length === 0 && (
             <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-sm text-blue-700">
-                <strong>Demo Mode:</strong> Images upload to Cloudinary, but products need database setup for full functionality. 
+                <strong>Demo Mode:</strong> Images upload to Cloudinary, but products need database setup for full functionality.
                 <a href="/database/SETUP_INSTRUCTIONS.md" className="underline ml-1">View setup guide</a>
               </p>
             </div>
@@ -411,7 +456,7 @@ export const ProductManager: React.FC = () => {
                 {editingProduct ? 'Update product information' : 'Create a new jewelry product'}
               </DialogDescription>
             </DialogHeader>
-            
+
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Information */}
               <div className="space-y-6">
@@ -419,7 +464,7 @@ export const ProductManager: React.FC = () => {
                   <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
                   <p className="text-sm text-gray-500">Enter the basic details of your product</p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
@@ -432,7 +477,7 @@ export const ProductManager: React.FC = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="short_description">Short Description</Label>
                       <Input
@@ -442,7 +487,7 @@ export const ProductManager: React.FC = () => {
                         placeholder="Elegant diamond ring with..."
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="price">Price (₹) *</Label>
@@ -466,7 +511,7 @@ export const ProductManager: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="category">Category</Label>
                       <Select value={formData.category_id} onValueChange={(value) => setFormData(prev => ({ ...prev, category_id: value }))}>
@@ -482,7 +527,7 @@ export const ProductManager: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="status">Status</Label>
@@ -507,7 +552,7 @@ export const ProductManager: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="description">Description</Label>
@@ -519,20 +564,20 @@ export const ProductManager: React.FC = () => {
                         rows={4}
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="tags">Tags (comma separated)</Label>
                       <Input
                         id="tags"
                         value={formData.tags.join(', ')}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
+                        onChange={(e) => setFormData(prev => ({
+                          ...prev,
                           tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
                         }))}
                         placeholder="diamond, ring, gold, luxury"
                       />
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="sku">SKU</Label>
@@ -555,11 +600,14 @@ export const ProductManager: React.FC = () => {
                         />
                       </div>
                     </div>
-                    
+
                     {/* Inventory Section */}
                     <div className="space-y-4 border-t pt-4">
-                      <Label className="text-base font-semibold">Inventory Management</Label>
-                      
+                      <div>
+                        <Label className="text-base font-semibold">Inventory Management</Label>
+                        <p className="text-sm text-gray-500 mt-1">Set initial stock quantity. Products with 0 stock will show as "Out of Stock".</p>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="quantity">Stock Quantity</Label>
@@ -567,14 +615,14 @@ export const ProductManager: React.FC = () => {
                             id="quantity"
                             type="number"
                             value={formData.inventory?.quantity || 0}
-                            onChange={(e) => setFormData(prev => ({ 
-                              ...prev, 
-                              inventory: { 
-                                ...prev.inventory!, 
-                                quantity: Number(e.target.value) 
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              inventory: {
+                                ...prev.inventory!,
+                                quantity: Number(e.target.value)
                               }
                             }))}
-                            placeholder="100"
+                            placeholder="Enter stock quantity (e.g., 50)"
                           />
                         </div>
                         <div>
@@ -583,27 +631,27 @@ export const ProductManager: React.FC = () => {
                             id="low_stock_threshold"
                             type="number"
                             value={formData.inventory?.low_stock_threshold || 10}
-                            onChange={(e) => setFormData(prev => ({ 
-                              ...prev, 
-                              inventory: { 
-                                ...prev.inventory!, 
-                                low_stock_threshold: Number(e.target.value) 
+                            onChange={(e) => setFormData(prev => ({
+                              ...prev,
+                              inventory: {
+                                ...prev.inventory!,
+                                low_stock_threshold: Number(e.target.value)
                               }
                             }))}
                             placeholder="10"
                           />
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <Switch
                           id="track_inventory"
                           checked={formData.inventory?.track_inventory !== false}
-                          onCheckedChange={(checked) => setFormData(prev => ({ 
-                            ...prev, 
-                            inventory: { 
-                              ...prev.inventory!, 
-                              track_inventory: checked 
+                          onCheckedChange={(checked) => setFormData(prev => ({
+                            ...prev,
+                            inventory: {
+                              ...prev.inventory!,
+                              track_inventory: checked
                             }
                           }))}
                         />
@@ -613,20 +661,19 @@ export const ProductManager: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Product Images */}
               <div className="space-y-6">
                 <div className="border-b pb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Product Images</h3>
                   <p className="text-sm text-gray-500">Upload high-quality images that will be stored on Cloudinary</p>
                 </div>
-                
-                <div 
-                  className={`border-2 border-dashed rounded-xl p-8 transition-colors ${
-                    uploadingImages 
-                      ? 'border-blue-300 bg-blue-50' 
+
+                <div
+                  className={`border-2 border-dashed rounded-xl p-8 transition-colors ${uploadingImages
+                      ? 'border-blue-300 bg-blue-50'
                       : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-                  }`}
+                    }`}
                   onDrop={(e) => {
                     e.preventDefault()
                     const files = e.dataTransfer.files
@@ -673,7 +720,7 @@ export const ProductManager: React.FC = () => {
                     )}
                   </div>
                 </div>
-                
+
                 {/* Image Preview */}
                 {productImages.length > 0 && (
                   <div className="space-y-4">
@@ -691,7 +738,7 @@ export const ProductManager: React.FC = () => {
                               className="w-full h-full object-cover"
                             />
                           </div>
-                          
+
                           {/* Overlay with controls */}
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity space-x-2">
@@ -716,14 +763,14 @@ export const ProductManager: React.FC = () => {
                               </Button>
                             </div>
                           </div>
-                          
+
                           {/* Primary badge */}
                           {image.is_primary && (
                             <Badge className="absolute top-2 left-2 bg-green-500 text-white text-xs">
                               Primary
                             </Badge>
                           )}
-                          
+
                           {/* Image number */}
                           <div className="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">
                             {index + 1}
@@ -734,23 +781,23 @@ export const ProductManager: React.FC = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Form Actions */}
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t">
                 <div className="text-sm text-gray-500">
                   {editingProduct ? 'Update product information' : 'All fields marked with * are required'}
                 </div>
                 <div className="flex space-x-3">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => setIsDialogOpen(false)}
                     className="min-w-[100px]"
                   >
                     Cancel
                   </Button>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     disabled={loading || !formData.name || !formData.price}
                     className="min-w-[140px] bg-[#ff8fab] hover:bg-[#ff7a9a]"
                   >

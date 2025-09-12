@@ -30,9 +30,7 @@ export async function GET(request: NextRequest) {
       query = query.eq('product_id', productId)
     }
 
-    if (lowStock === 'true') {
-      query = query.lt('quantity', 10) // Low stock threshold
-    }
+    // Note: We'll filter low stock items after fetching since Supabase doesn't easily support column comparisons
 
     query = query.range(offset, offset + limit - 1)
 
@@ -43,7 +41,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch inventory' }, { status: 500 })
     }
 
-    return NextResponse.json(data || [])
+    let filteredData = data || []
+
+    // Filter low stock items if requested
+    if (lowStock === 'true') {
+      filteredData = filteredData.filter(item => {
+        const availableStock = item.quantity - item.reserved_quantity
+        return availableStock <= item.low_stock_threshold && availableStock > 0
+      })
+    }
+
+    return NextResponse.json(filteredData)
   } catch (error) {
     console.error('Inventory fetch error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
