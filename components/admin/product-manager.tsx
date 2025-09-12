@@ -108,7 +108,11 @@ export const ProductManager: React.FC = () => {
           { id: '550e8400-e29b-41d4-a716-446655440004', name: 'Pendants', slug: 'pendants', status: 'active', sort_order: 4, created_at: '', updated_at: '' },
           { id: '550e8400-e29b-41d4-a716-446655440005', name: 'Earrings', slug: 'earrings', status: 'active', sort_order: 5, created_at: '', updated_at: '' },
           { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Rings', slug: 'rings', status: 'active', sort_order: 6, created_at: '', updated_at: '' },
-          { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Bracelet', slug: 'bracelet', status: 'active', sort_order: 7, created_at: '', updated_at: '' }
+          { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Bracelet', slug: 'bracelet', status: 'active', sort_order: 7, created_at: '', updated_at: '' },
+          { id: '550e8400-e29b-41d4-a716-446655440008', name: 'Couple Goals', slug: 'couple-goals', status: 'active', sort_order: 8, created_at: '', updated_at: '' },
+          { id: '550e8400-e29b-41d4-a716-446655440009', name: 'Gifts', slug: 'gifts', status: 'active', sort_order: 9, created_at: '', updated_at: '' },
+          { id: '550e8400-e29b-41d4-a716-446655440010', name: 'Anklets', slug: 'anklets', status: 'active', sort_order: 10, created_at: '', updated_at: '' },
+          { id: '550e8400-e29b-41d4-a716-446655440011', name: 'Ladoo Gopal Shringaar', slug: 'ladoo-gopal-shringaar', status: 'active', sort_order: 11, created_at: '', updated_at: '' }
         ])
       }
     } catch (error) {
@@ -120,7 +124,11 @@ export const ProductManager: React.FC = () => {
         { id: '550e8400-e29b-41d4-a716-446655440004', name: 'Pendants', slug: 'pendants', status: 'active', sort_order: 4, created_at: '', updated_at: '' },
         { id: '550e8400-e29b-41d4-a716-446655440005', name: 'Earrings', slug: 'earrings', status: 'active', sort_order: 5, created_at: '', updated_at: '' },
         { id: '550e8400-e29b-41d4-a716-446655440006', name: 'Rings', slug: 'rings', status: 'active', sort_order: 6, created_at: '', updated_at: '' },
-        { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Bracelet', slug: 'bracelet', status: 'active', sort_order: 7, created_at: '', updated_at: '' }
+        { id: '550e8400-e29b-41d4-a716-446655440007', name: 'Bracelet', slug: 'bracelet', status: 'active', sort_order: 7, created_at: '', updated_at: '' },
+        { id: '550e8400-e29b-41d4-a716-446655440008', name: 'Couple Goals', slug: 'couple-goals', status: 'active', sort_order: 8, created_at: '', updated_at: '' },
+        { id: '550e8400-e29b-41d4-a716-446655440009', name: 'Gifts', slug: 'gifts', status: 'active', sort_order: 9, created_at: '', updated_at: '' },
+        { id: '550e8400-e29b-41d4-a716-446655440010', name: 'Anklets', slug: 'anklets', status: 'active', sort_order: 10, created_at: '', updated_at: '' },
+        { id: '550e8400-e29b-41d4-a716-446655440011', name: 'Ladoo Gopal Shringaar', slug: 'ladoo-gopal-shringaar', status: 'active', sort_order: 11, created_at: '', updated_at: '' }
       ])
     }
   }

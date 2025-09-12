@@ -3,11 +3,13 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!supabase) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
+
+  const { id } = await params;
 
   try {
     const { data, error } = await supabase
@@ -21,7 +23,7 @@ export async function GET(
           price
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -38,11 +40,13 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!supabase) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
+
+  const { id } = await params;
 
   try {
     const body = await request.json()
@@ -59,7 +63,7 @@ export async function PUT(
     const { data, error } = await supabase
       .from('inventory')
       .update(updateData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -73,7 +77,7 @@ export async function PUT(
       await supabase
         .from('inventory_adjustments')
         .insert({
-          inventory_id: params.id,
+          inventory_id: id,
           adjustment_type: 'manual',
           quantity_change: quantity - (data.quantity || 0),
           reason: adjustment_reason,
@@ -90,17 +94,19 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!supabase) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
   }
 
+  const { id } = await params;
+
   try {
     const { error } = await supabase
       .from('inventory')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Database error:', error)

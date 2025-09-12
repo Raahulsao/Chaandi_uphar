@@ -95,7 +95,9 @@ INSERT INTO categories (id, name, slug, description, sort_order, status) VALUES
   ('550e8400-e29b-41d4-a716-446655440006', 'Rings', 'rings', 'Exquisite rings', 6, 'active'),
   ('550e8400-e29b-41d4-a716-446655440007', 'Bracelet', 'bracelet', 'Stylish bracelets', 7, 'active'),
   ('550e8400-e29b-41d4-a716-446655440008', 'Couple Goals', 'couple-goals', 'Perfect for couples', 8, 'active'),
-  ('550e8400-e29b-41d4-a716-446655440009', 'Gifts', 'gifts', 'Perfect gift items', 9, 'active')
+  ('550e8400-e29b-41d4-a716-446655440009', 'Gifts', 'gifts', 'Perfect gift items', 9, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440010', 'Anklets', 'anklets', 'Beautiful anklets and ankle jewelry', 10, 'active'),
+  ('550e8400-e29b-41d4-a716-446655440011', 'Ladoo Gopal Shringaar', 'ladoo-gopal-shringaar', 'Traditional Ladoo Gopal decoration items', 11, 'active')
 ON CONFLICT (id) DO NOTHING;
 
 -- Disable RLS for now to make it work immediately
@@ -113,3 +115,4 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role
 SELECT 'Database setup completed successfully! You can now create products.' as message;
 SELECT COUNT(*) as categories_created FROM categories;
 SELECT 'Tables created: categories, products, product_images, inventory, inventory_adjustments' as tables_info;
+SELECT 'Categories available: Jewellery, Silver, Chains, Pendants, Earrings, Rings, Bracelet, Couple Goals, Gifts, Anklets, Ladoo Gopal Shringaar' as categories_info;

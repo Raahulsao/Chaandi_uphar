@@ -4,7 +4,7 @@ import { db, isSupabaseAvailable, supabase } from '@/lib/supabase';
 // GET /api/categories/[id] - Get single category
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!isSupabaseAvailable) {
     return NextResponse.json(
@@ -13,7 +13,7 @@ export async function GET(
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     // Check if id is a UUID or slug
@@ -54,7 +54,7 @@ export async function GET(
 // PUT /api/categories/[id] - Update category
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!isSupabaseAvailable) {
     return NextResponse.json(
@@ -63,7 +63,7 @@ export async function PUT(
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const updates = await request.json();
@@ -97,7 +97,7 @@ export async function PUT(
 // DELETE /api/categories/[id] - Delete category
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   if (!isSupabaseAvailable) {
     return NextResponse.json(
@@ -106,7 +106,7 @@ export async function DELETE(
     );
   }
 
-  const { id } = params;
+  const { id } = await params;
 
   try {
     // Check if category has products

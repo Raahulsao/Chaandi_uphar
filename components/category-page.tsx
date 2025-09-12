@@ -75,12 +75,12 @@ export function CategoryPage({ title }: { title: string }) {
     'Pendants': '550e8400-e29b-41d4-a716-446655440004',
     'Chains': '550e8400-e29b-41d4-a716-446655440003',
     'Silver': '550e8400-e29b-41d4-a716-446655440002',
-    'Anklets': '550e8400-e29b-41d4-a716-446655440007', // Map to Bracelet category
+    'Anklets': '550e8400-e29b-41d4-a716-446655440010', // Now maps to dedicated Anklets category
     'Gifts': '550e8400-e29b-41d4-a716-446655440009',
     'Jewelry': '550e8400-e29b-41d4-a716-446655440001',
     'Jewellery': '550e8400-e29b-41d4-a716-446655440001',
     'Couple Goals': '550e8400-e29b-41d4-a716-446655440008',
-    'Ladoo Gopal Shringaar': '550e8400-e29b-41d4-a716-446655440009' // Map to Gifts category
+    'Ladoo Gopal Shringaar': '550e8400-e29b-41d4-a716-446655440011' // Now maps to dedicated Ladoo Gopal Shringaar category
   }
 
   // Fetch real products from API
