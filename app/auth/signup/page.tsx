@@ -1,7 +1,7 @@
 'use client';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, Phone, User, Mail, Lock, Gem, Sparkles, Gift } from 'lucide-react';
+import { Eye, EyeOff, Phone, User, Mail, Lock, Gem, Sparkles, Gift, CheckCircle, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 const SignUpPage = () => {
   const [mobileNumber, setMobileNumber] = useState('');
@@ -21,8 +22,33 @@ const SignUpPage = () => {
   const [referralCode, setReferralCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [referralValidation, setReferralValidation] = useState<{
+    valid: boolean;
+    message: string;
+    referrer?: { name: string; email: string };
+    rewards?: { signupBonus: number; firstOrderDiscount: number; referrerReward: number };
+  } | null>(null);
+  const [validatingReferral, setValidatingReferral] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { registerUser, validateReferralCode } = useAuth();
+
+  // Validate referral code when user types
+  useEffect(() => {
+    const validateReferral = async () => {
+      if (referralCode.trim().length >= 8) { // JOHN1234 format
+        setValidatingReferral(true);
+        const validation = await validateReferralCode(referralCode.trim());
+        setReferralValidation(validation);
+        setValidatingReferral(false);
+      } else {
+        setReferralValidation(null);
+      }
+    };
+
+    const timeoutId = setTimeout(validateReferral, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [referralCode, validateReferralCode]);
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,30 +86,27 @@ const SignUpPage = () => {
     }
     
     try {
-      // Create user with email and password
+      // Create user with email and password in Firebase
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       
-      // Update user profile with name
+      // Update user profile with name in Firebase
       await updateProfile(user, {
         displayName: name,
       });
       
-      // Store additional user data (mobile, referral code) in your database here
-      console.log('User created with:', { 
-        uid: user.uid, 
-        name, 
-        email, 
-        mobileNumber, 
-        referralCode 
+      // Register user in our database with referral code
+      const result = await registerUser(user, {
+        email,
+        name,
+        mobileNumber,
+        referralCodeUsed: referralCode.trim() || undefined,
       });
       
-      toast({
-        title: "Account Created Successfully!",
-        description: `Welcome to Chaandi Uphar, ${name}!`,
-      });
+      if (result.success) {
+        router.push('/account');
+      }
       
-      router.push('/account');
     } catch (error: any) {
       console.error('Sign up error:', error);
       
@@ -142,19 +165,17 @@ const SignUpPage = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       
-      // Store additional data if needed
-      console.log('Google sign up:', { 
-        uid: user.uid, 
-        name: user.displayName, 
-        email: user.email 
+      // Register user in our database
+      const registrationResult = await registerUser(user, {
+        email: user.email!,
+        name: user.displayName || user.email?.split('@')[0] || 'User',
+        referralCodeUsed: referralCode.trim() || undefined,
       });
       
-      toast({
-        title: "Account Created Successfully!",
-        description: `Welcome ${user.displayName || 'User'}!`,
-      });
+      if (registrationResult.success) {
+        router.push('/account');
+      }
       
-      router.push('/account');
     } catch (error: any) {
       console.error('Google sign up error:', error);
       
@@ -312,10 +333,52 @@ const SignUpPage = () => {
                     placeholder="Enter referral code for special benefits"
                     value={referralCode}
                     onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                    className="pl-12 h-12 border-gray-200 focus:border-[#ff8fab] focus:ring-[#ff8fab]/20 rounded-xl font-serif"
+                    className={`pl-12 pr-12 h-12 border-gray-200 focus:border-[#ff8fab] focus:ring-[#ff8fab]/20 rounded-xl font-serif ${
+                      referralValidation?.valid === true ? 'border-green-300 bg-green-50' :
+                      referralValidation?.valid === false ? 'border-red-300 bg-red-50' : ''
+                    }`}
                   />
+                  {validatingReferral && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#ff8fab]"></div>
+                    </div>
+                  )}
+                  {referralValidation && !validatingReferral && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      {referralValidation.valid ? (
+                        <CheckCircle className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <AlertCircle className="h-5 w-5 text-red-500" />
+                      )}
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-gray-500 font-serif">Have a referral code? Enter it to unlock exclusive benefits!</p>
+                
+                {/* Referral validation feedback */}
+                {referralValidation && (
+                  <div className={`text-sm font-serif p-3 rounded-lg ${
+                    referralValidation.valid 
+                      ? 'bg-green-50 border border-green-200 text-green-800' 
+                      : 'bg-red-50 border border-red-200 text-red-800'
+                  }`}>
+                    <p className="font-medium">{referralValidation.message}</p>
+                    {referralValidation.valid && referralValidation.referrer && (
+                      <div className="mt-2 space-y-1">
+                        <p className="text-xs">Referred by: <span className="font-semibold">{referralValidation.referrer.name}</span></p>
+                        {referralValidation.rewards && (
+                          <div className="text-xs space-y-1">
+                            <p>• Welcome Bonus: ₹{referralValidation.rewards.signupBonus}</p>
+                            <p>• First Order Discount: ₹{referralValidation.rewards.firstOrderDiscount}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {!referralValidation && (
+                  <p className="text-xs text-gray-500 font-serif">Have a referral code? Enter it to unlock exclusive benefits!</p>
+                )}
               </div>
 
               <div className="flex items-start space-x-2">

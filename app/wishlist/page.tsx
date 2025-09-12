@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 const wishlistItems = [
   {
     id: "1",
+    slug: "rose-gold-pretty-woman-necklace",
     name: "Rose Gold Pretty Woman Necklace",
     price: 7399,
     originalPrice: 11999,
@@ -21,6 +22,7 @@ const wishlistItems = [
   },
   {
     id: "2",
+    slug: "silver-mahabali-hanuman-pendant",
     name: "Silver Mahabali Hanuman Pendant",
     price: 3499,
     originalPrice: 5599,
@@ -33,6 +35,7 @@ const wishlistItems = [
   },
   {
     id: "3",
+    slug: "diamond-eternity-ring",
     name: "Diamond Eternity Ring",
     price: 12999,
     originalPrice: 18999,
@@ -215,7 +218,7 @@ export default function WishlistPage() {
                       <ShoppingBag className="w-4 h-4 mr-2" />
                       {item.inStock ? "Add to Cart" : "Notify When Available"}
                     </Button>
-                    <Link href={`/product/${item.id}`}>
+                    <Link href={`/product/${item.slug}`}>
                       <Button 
                         variant="outline" 
                         className="w-full border-[#ff8fab] text-[#ff8fab] hover:bg-[#ff8fab] hover:text-white font-serif text-sm rounded-lg transition-all duration-300"

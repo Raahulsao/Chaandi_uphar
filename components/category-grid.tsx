@@ -8,6 +8,7 @@ import Link from "next/link"
 const categories = [
   {
     id: "1",
+    slug: "rose-gold-pretty-woman-necklace",
     name: "Rose Gold Pretty Woman Necklace",
     image: "/luxury-diamond-ring.png",
     href: "/rings",
@@ -19,6 +20,7 @@ const categories = [
   },
   {
     id: "2",
+    slug: "golden-floral-moon-mangalsutra",
     name: "Golden Floral Moon Mangalsutra",
     image: "/gold-necklace-pendant.png",
     href: "/necklaces",
@@ -88,7 +90,7 @@ export function CategoryGrid() {
                   </div>
 
                   <Link
-                    href={`/product/${category.id}`}
+                    href={`/product/${category.slug}`}
                     className="block relative aspect-square overflow-hidden bg-muted"
                   >
                     <img
@@ -120,7 +122,7 @@ export function CategoryGrid() {
                       <span className="text-sm text-muted-foreground line-through">{category.originalPrice}</span>
                     </div>
 
-                    <Link href={`/product/${category.id}`}>
+                    <Link href={`/product/${category.slug}`}>
                       <h3 className="font-medium text-sm text-foreground mb-3 line-clamp-2 hover:text-secondary cursor-pointer transition-colors">
                         {category.name}
                       </h3>
@@ -136,7 +138,7 @@ export function CategoryGrid() {
                     >
                       Add to Cart
                     </Button>
-                    <Link href={`/product/${category.id}`} className="text-center text-sm text-pink-600 hover:text-pink-800 mb-2 border border-pink-600 rounded-md py-1">View Details</Link>
+                    <Link href={`/product/${category.slug}`} className="text-center text-sm text-pink-600 hover:text-pink-800 mb-2 border border-pink-600 rounded-md py-1">View Details</Link>
                   </div>
                 </CardContent>
               </Card>

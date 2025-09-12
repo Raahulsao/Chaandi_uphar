@@ -23,7 +23,7 @@ const testimonials = [
     location: "Bangalore",
     rating: 5,
     text: "I've been a customer for over two years now. Every piece I've purchased has been perfect. The attention to detail is remarkable.",
-    image: "/young-indian-woman-headshot.png",
+    image: "/placeholder-user.jpg",
   },
 ]
 

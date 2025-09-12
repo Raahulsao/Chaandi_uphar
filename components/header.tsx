@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/lib/firebase"
 import { Search, Heart, ShoppingBag, Menu, User, MapPin, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +15,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [pincode, setPincode] = useState<string>("")
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -24,7 +27,19 @@ export function Header() {
       const saved = window.localStorage.getItem("luxe_pincode")
       if (saved) setPincode(saved)
     } catch {}
-    return () => window.removeEventListener("scroll", handleScroll)
+    
+    // Firebase auth state listener
+    let unsubscribe: (() => void) | undefined
+    if (auth) {
+      unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        setUser(firebaseUser)
+      })
+    }
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      if (unsubscribe) unsubscribe()
+    }
   }, [])
 
   const categories = [
@@ -130,9 +145,9 @@ export function Header() {
 
             {/* Right Section - Icons */}
             <div className="flex items-center gap-1">
-              <Link href="/auth/login" className="text-black p-2 hover:bg-gray-100 rounded-md">
+              <Link href={user ? "/account" : "/auth/login"} className="text-black p-2 hover:bg-gray-100 rounded-md">
                 <User className="h-5 w-5" />
-                <span className="sr-only">Account</span>
+                <span className="sr-only">{user ? "Account" : "Login"}</span>
               </Link>
               <Link href="/wishlist" className="text-black p-2 hover:bg-gray-100 rounded-md">
                 <Heart className="h-5 w-5" />
@@ -236,10 +251,10 @@ export function Header() {
                 <div className="flex items-center space-x-4 lg:space-x-6">
                   <Link href="/stores" className="hidden lg:flex flex-col items-center text-xs group"></Link>
 
-                  <Link href="/auth/login" className="flex flex-col items-center text-xs group">
+                  <Link href={user ? "/account" : "/auth/login"} className="flex flex-col items-center text-xs group">
                     <User className="w-5 h-5 mb-1 text-gray-700 group-hover:text-[#ff8fab] transition-colors" />
                     <span className="text-gray-900 font-medium text-[10px] group-hover:text-[#ff8fab] transition-colors">
-                      ACCOUNT
+                      {user ? "ACCOUNT" : "LOGIN"}
                     </span>
                   </Link>
 
